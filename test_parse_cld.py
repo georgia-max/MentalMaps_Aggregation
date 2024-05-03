@@ -42,7 +42,7 @@ class TestParseCLD(unittest.TestCase):
     def test_get_adjacency_matrix(self):
         df_cld = get_cld_df(self.cld_data)
         my_dict = get_dict_to_vars(self.cld_data)
-        adj_matrix = get_adjacency_matrix(df_cld, my_dict)
+        adj_matrix = get_adjacency_matrix(df_cld)
 
         # Assert the shape of the adjacency matrix
         self.assertEqual(adj_matrix.shape, (len(my_dict), len(my_dict)))
@@ -50,7 +50,7 @@ class TestParseCLD(unittest.TestCase):
     def test_get_polarity_matrix(self):
         df_cld = get_cld_df(self.cld_data)
         my_dict = get_dict_to_vars(self.cld_data)
-        pol_matrix = get_polarity_matrix(df_cld, my_dict)
+        pol_matrix = get_polarity_matrix(df_cld)
         # Assert the shape of the polarity matrix
         self.assertEqual(pol_matrix.shape, (len(my_dict), len(my_dict)))
 

@@ -72,7 +72,7 @@ def get_dict_to_vars(df):
     else:
         return {}
 
-def get_adjacency_matrix(df_new, dict_var):
+def get_adjacency_matrix(df_new):
     """
     Generates an adjacency matrix of links from the input DataFrame containing CLD data.
     :param df_new:
@@ -84,10 +84,10 @@ def get_adjacency_matrix(df_new, dict_var):
     link_matrix = df_new.pivot(index='from', columns='to', values='links').fillna(0).astype(int)
 
     # change the columns names by using dict_var
-    link_matrix.columns = link_matrix.columns.map(dict_var)
+    # link_matrix.columns = link_matrix.columns.map(dict_var)
     return link_matrix
 
-def get_polarity_matrix(df_new, dict_var):
+def get_polarity_matrix(df_new):
     """
     Generates a polarity matrix from the input DataFrame containing CLD data.
     :param df_new:
@@ -95,7 +95,7 @@ def get_polarity_matrix(df_new, dict_var):
     :return: polarity_matrix, +1 is positive, -1 is negative
     """
     polarity_matrix = df_new.pivot(index='from', columns='to', values='polarity_type').fillna(0).astype(int)
-    polarity_matrix.columns = polarity_matrix.columns.map(dict_var)
+    # polarity_matrix.columns = polarity_matrix.columns.map(dict_var)
     return polarity_matrix
 
 
