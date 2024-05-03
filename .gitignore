@@ -1,0 +1,10 @@
+# created by virtualenv automatically
+*.mdl
+*.pyc
+
+Output/
+Dataset/
+
+.new_venv/
+.new_venv
+.idea/
