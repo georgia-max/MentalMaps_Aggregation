@@ -1,6 +1,8 @@
 import pandas as pd
 import regex as re
 import numpy as np
+import networkx as nx
+import itertools as it
 
 def read_cld_file(file_path):
     """
@@ -99,6 +101,7 @@ def get_adjacency_matrix(df_new):
 
     return link_matrix
 
+
 def get_polarity_matrix(df_new):
     """
     Generates a polarity matrix from the input DataFrame containing CLD data.
@@ -124,3 +127,18 @@ def get_polarity_matrix(df_new):
 
     return polarity_matrix
 
+
+def get_dict_of_dicts(df_subset):
+    """
+    Creates a dictionary of dictionaries from the input DataFrame, where the outer dictionary keys are the 'from'
+    values and the inner dictionary keys are the 'to' values.
+    This function stores the link information in a more efficient data structure for further processing.
+
+    The dataset should only have three columns, from, to and weight
+    :param df:
+    :return: dictionary of dictionaries
+
+    """
+    d = df_subset.groupby('from').apply(lambda x: x.set_index('to').to_dict(orient='index'),
+                                        include_groups=False).to_dict()
+    return d
