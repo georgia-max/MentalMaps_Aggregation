@@ -80,11 +80,23 @@ def get_adjacency_matrix(df_new):
     :return: ad_matrix, row is from and column is to.
     """
 
-    # Make a adjency matrix from df_links column from, to and links
+    # Make a adjacency matrix from df_links column from, to and links
     link_matrix = df_new.pivot(index='from', columns='to', values='links').fillna(0).astype(int)
 
-    # change the columns names by using dict_var
-    # link_matrix.columns = link_matrix.columns.map(dict_var)
+    missing_cols = set(link_matrix.index) - set(link_matrix.columns)
+    missing_rows = set(link_matrix.columns) - set(link_matrix.index)
+
+    if len(missing_cols) > 0:
+        for col in missing_cols:
+            link_matrix[col] = 0
+    if len(missing_rows) > 0:
+        for row in missing_rows:
+            link_matrix.loc[row] = 0
+
+    # Sort rows and cols by the index of dict_var
+    link_matrix = link_matrix.sort_index(axis=1)
+    link_matrix = link_matrix.sort_index(axis=0)
+
     return link_matrix
 
 def get_polarity_matrix(df_new):
@@ -95,7 +107,21 @@ def get_polarity_matrix(df_new):
     :return: polarity_matrix, +1 is positive, -1 is negative
     """
     polarity_matrix = df_new.pivot(index='from', columns='to', values='polarity_type').fillna(0).astype(int)
-    # polarity_matrix.columns = polarity_matrix.columns.map(dict_var)
+
+    missing_cols = set(polarity_matrix.index) - set(polarity_matrix.columns)
+    missing_rows = set(polarity_matrix.columns) - set(polarity_matrix.index)
+
+    if len(missing_cols) > 0:
+        for col in missing_cols:
+            polarity_matrix[col] = 0
+    if len(missing_rows) > 0:
+        for row in missing_rows:
+            polarity_matrix.loc[row] = 0
+
+    # Sort rows and cols by the index of dict_var
+    polarity_matrix = polarity_matrix.sort_index(axis=1)
+    polarity_matrix = polarity_matrix.sort_index(axis=0)
+
     return polarity_matrix
 
 

@@ -4,9 +4,10 @@ from parse_cld import read_cld_file, get_cld_df, get_dict_to_vars, get_adjacency
 
 
 class TestParseCLD(unittest.TestCase):
+    #TODO: fix the test case
 
     def setUp(self):
-        self.cld_data = read_cld_file('Testing/test.mdl')
+        self.cld_data = read_cld_file('Testing/rabbit_example.mdl.mdl')
         print(self.cld_data.head())
 
     def test_read_cld_file(self):
