@@ -55,6 +55,10 @@ class TestParseCLD(unittest.TestCase):
         # Assert the shape of the polarity matrix
         self.assertEqual(pol_matrix.shape, (len(my_dict), len(my_dict)))
 
+    def test_df_to_adjacency_list(self):
+        none
+
+
 
 if __name__ == '__main__':
     unittest.main()

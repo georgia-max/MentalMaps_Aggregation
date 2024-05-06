@@ -124,4 +124,3 @@ def get_polarity_matrix(df_new):
 
     return polarity_matrix
 
-
