@@ -1,5 +1,7 @@
 # created by virtualenv automatically
 *.mdl
+# except files in Testing folder
+!Testing/*.mdl
 *.pyc
 *.png
 *.json
