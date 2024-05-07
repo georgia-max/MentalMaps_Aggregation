@@ -1,12 +1,12 @@
 from tqdm import tqdm
-
 import matplotlib.pyplot as plt
-import parse_cld, cld_nx
 import networkx as nx
 import pickle
 import sys
 import time
 
+import parse_cld
+import cld_nx
 
 def main():
 
@@ -22,13 +22,18 @@ def main():
     d = parse_cld.get_cld(df)
     dict_vars_name = parse_cld.get_dict_to_vars(df)
 
+    # combine the variable names dict and cld data
+    cld_data = [dict_vars_name, d]
+
     with open(output_file, 'wb') as f:
-        pickle.dump(d, f)
+        pickle.dump(cld_data, f)
 
     G = nx.MultiDiGraph(d)
     cld_nx.draw_labeled_multigraph(G, "weight", dict_vars_name)
     # plt.show()
     plt.savefig(file_name + ".png")
+
+
 
 
 if __name__ == "__main__":

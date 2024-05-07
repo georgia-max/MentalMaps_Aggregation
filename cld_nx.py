@@ -9,7 +9,7 @@ def draw_labeled_multigraph(G, attr_name, mapping, ax=None):
     Draws a labeled multigraph using NetworkX and Matplotlib.
     https://networkx.org/documentation/stable/auto_examples/drawing/plot_multigraphs.html
     """
-    plt.figure(figsize=(20, 10))
+    plt.figure(figsize=(15, 10))
 
     # Works with arc3 and angle3 connectionstyles
     connectionstyle = [f"arc3,rad={r}" for r in it.accumulate([0.15] * 4)]
@@ -18,7 +18,7 @@ def draw_labeled_multigraph(G, attr_name, mapping, ax=None):
 
     pos = nx.circular_layout(G, scale = 0.2)
     nx.draw_networkx_nodes(G, pos, ax=ax, node_color="tab:blue", node_size=100)
-    nx.draw_networkx_labels(G, pos, font_size=10, ax=ax)
+    nx.draw_networkx_labels(G, pos, font_size=20, ax=ax)
     nx.draw_networkx_edges(
         G, pos, edge_color="red",
         connectionstyle=connectionstyle,
@@ -36,6 +36,7 @@ def draw_labeled_multigraph(G, attr_name, mapping, ax=None):
         connectionstyle=connectionstyle,
         label_pos=0.3,
         font_color="red",
+        font_size= 20,
         bbox={"alpha": 0},
         ax=ax,
     )

@@ -3,8 +3,8 @@
 # Run  ./test_script.sh
 
 # Define the directories
-INPUT_DIR="Dataset/RC_Models-selected"
-OUTPUT_DIR="Output/Spectral_layout"
+INPUT_DIR="Dataset/Overcome/SF_Models"
+OUTPUT_DIR="Output/Overcome/SF_Models"
 
 # Create the output directory if it doesn't already exist
 mkdir -p "$OUTPUT_DIR"
