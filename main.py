@@ -1,22 +1,45 @@
-from parse_cld import read_cld_file, get_cld_df, get_dict_to_vars, get_adjacency_matrix, get_polarity_matrix
+from tqdm import tqdm
 
-df = read_cld_file('Dataset/clean models/aggregate reentry DSS model.mdl')
-
-# df = read_cld_file('Testing/rabbit_example.mdl')
-df_cld = get_cld_df(df)
-# df_cld.to_csv('Output/df_cld.csv')
-
-my_dict = get_dict_to_vars(df)
-print(my_dict)
-print(len(my_dict))
-
-adj_matrix = get_adjacency_matrix(df_cld)
-print(adj_matrix)
-print(adj_matrix.shape)
-pol_matrix = get_polarity_matrix(df_cld)
-
-print(pol_matrix)
+import matplotlib.pyplot as plt
+import parse_cld, cld_nx
+import networkx as nx
+import pickle
+import sys
+import time
 
 
-# adj_matrix.to_csv('Output/adjacency_matrix.csv')
-# pol_matrix.to_csv('Output/polarity_matrix.csv')
+def main():
+
+    if len(sys.argv) != 3:
+        print("Usage: python3 main.py input.mdl")
+        sys.exit(1)
+
+    input_file = sys.argv[1]
+
+    output_file = sys.argv[2]
+    file_name = output_file.split(".")[0]
+
+    df = parse_cld.read_cld_file(input_file)
+    df_cld = parse_cld.get_cld_df(df)
+
+    my_dict = parse_cld.get_dict_to_vars(df)
+
+    df_subset = df_cld[['from', 'to', 'polarity_type']]
+
+    # Change the column name polarity type of weight
+    df_subset = df_subset.rename(columns={'polarity_type': 'weight'})
+    d = parse_cld.get_dict_of_dicts(df_subset)
+
+    with open(output_file, 'wb') as f:
+        pickle.dump(d, f)
+
+    G = nx.MultiDiGraph(d)
+    cld_nx.draw_labeled_multigraph(G, "weight", my_dict)
+    plt.savefig(file_name + ".png")
+
+
+if __name__ == "__main__":
+    for i in tqdm(range(40), desc="Loading..."):
+        pass
+
+    main()

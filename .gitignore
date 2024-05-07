@@ -1,7 +1,8 @@
 # created by virtualenv automatically
 *.mdl
 *.pyc
-
+*.png
+*.json
 Output/
 Dataset/
 
