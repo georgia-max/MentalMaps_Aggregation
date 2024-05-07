@@ -142,3 +142,21 @@ def get_dict_of_dicts(df_subset):
     d = df_subset.groupby('from').apply(lambda x: x.set_index('to').to_dict(orient='index'),
                                         include_groups=False).to_dict()
     return d
+
+def get_cld(df):
+    """
+    Extracts, organizes, and transforms the CLD data from the input DataFrame to a dict-of-dicts data structure.
+    :param df:
+    :return:
+    """
+    df_cld = get_cld_df(df)
+
+    # my_dict = get_dict_to_vars(df)
+
+    df_subset = df_cld[['from', 'to', 'polarity_type']]
+
+    # Change the column name polarity type of weight
+    df_subset = df_subset.rename(columns={'polarity_type': 'weight'})
+    d = get_dict_of_dicts(df_subset)
+    return d
+

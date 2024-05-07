@@ -1,8 +1,10 @@
 #!/bin/bash
 
+# Run  ./test_script.sh
+
 # Define the directories
 INPUT_DIR="Dataset/RC_Models-selected"
-OUTPUT_DIR="Output/RC_Models-selected"
+OUTPUT_DIR="Output/Spectral_layout"
 
 # Create the output directory if it doesn't already exist
 mkdir -p "$OUTPUT_DIR"
