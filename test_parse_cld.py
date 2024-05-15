@@ -7,14 +7,11 @@ class TestParseCLD(unittest.TestCase):
     #TODO: fix the test case
 
     def setUp(self):
-        self.cld_data = read_cld_file('Testing/rabbit_example.mdl.mdl')
-        print(self.cld_data.head())
+        self.cld_data = read_cld_file('Testing/rabbit_example.mdl')
+        # self.cld_data = read_cld_file('Dataset/SYNCH/Pine_Ridge/ME_10_5_2021_X2.mdl')
 
     def test_read_cld_file(self):
-        expected_output = [
-            10, '1', 'egg', '276', '168', '11', '8', '8', '3', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0',
-            '0\n'  #,
-        ]
+        expected_output = ['10,1,rabbit population,371,246,44,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0\n']
 
         # acutal_output= read_cld_file('Dataset/test.mdl')
         output_line = self.cld_data.iloc[0]
@@ -26,7 +23,7 @@ class TestParseCLD(unittest.TestCase):
         df_cld = get_cld_df(self.cld_data)
 
         expected_columns = ['type', 'index', 'from', 'to', 'polarity', 'links', 'polarity_type']
-        print(df_cld.iloc[0])
+        # print(df_cld.iloc[0])
         self.assertEqual(list(df_cld.columns), expected_columns)
         self.assertEqual(df_cld.iloc[0, 4], 45)
 

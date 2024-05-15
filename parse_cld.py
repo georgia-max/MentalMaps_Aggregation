@@ -14,32 +14,38 @@ def read_cld_file(file_path):
     with open(file_path, 'r') as f:
         lines = f.readlines()
 
-    # Compile regex to match line with sketch info
-    start_pattern = re.compile(r"\\\---///*")
-    end_pattern = re.compile(r'\/{3}-+\\{3}')
-
+    # # Compile regex to match line with sketch info
+    start_pattern = re.compile(r".*\*View 1.*")
+    view2_pattern = re.compile(r".*\*View 2.*")
+    end_pattern = view2_pattern if any(view2_pattern.match(line) for line in lines) else re.compile(r'/{3}-+\\{3}')
     extracted = []
     extract = False
 
     for line in lines:
-        if end_pattern.search(line):
-            # Stop extracting if end pattern found
-            extract = False
-
-        elif start_pattern.search(line):
-            # Start new extraction
-            extracted = []
+        if start_pattern.match(line):
+            # Start new extraction when "View 1" is found
             extract = True
+            extracted = []  # Reset extracted lines for new block
+            continue  # Skip to next iteration to avoid appending the start line itself
 
-        elif extract:
-            # Append to extracted lines
-            extracted.append(line)
+        if extract:
+            if end_pattern.match(line):
+                # Stop extracting if end pattern found and break if you only need the first block
+                extract = False
+                break
+            extracted.append(line)  # Append current line to extracted
 
-    extracted = extracted[3:]
+    # check the end_pattern what is the pattern.
+    if end_pattern == view2_pattern:
+        extracted = extracted[1:-2]  # Remove the first and last two lines
+    else:
+        extracted = extracted[1:]
     df = pd.DataFrame(extracted)
     df = df[0].str.split(',', expand=True)
     # change column 0 dytpe to int
     df[0] = df[0].astype(int)
+
+    # print(df)
 
     return df
 
@@ -52,8 +58,8 @@ def get_cld_df(df):
     """
 
     # Grab dependencies
-    df_new = df.loc[df[0]==1,  ]
-    df_new = df_new[[0,1, 2,3,6]]
+    df_new = df.loc[df[0]== 1,  ]
+    df_new = df_new[[0, 1, 2, 3, 6]]
     # Give dataframe new column names
     df_new = df_new.rename(columns={0: 'type', 1: 'index',2: 'from', 3: 'to', 6: 'polarity'})
     df_new['polarity'] = df_new['polarity'].astype(int)

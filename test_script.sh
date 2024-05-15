@@ -3,8 +3,8 @@
 # Run  ./test_script.sh
 
 # Define the directories
-INPUT_DIR="Dataset/Overcome/SF_Models"
-OUTPUT_DIR="Output/Overcome/SF_Models"
+INPUT_DIR="Dataset/SYNCH/Pine_Ridge"
+OUTPUT_DIR="Output/SYNCH"
 
 # Create the output directory if it doesn't already exist
 mkdir -p "$OUTPUT_DIR"

@@ -8,6 +8,7 @@
 Output/
 Dataset/
 
-.new_venv/
-.new_venv
+new_venv/
+new_venv
 .idea/
+.new_venv/
