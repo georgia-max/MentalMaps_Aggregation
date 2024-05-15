@@ -12,3 +12,7 @@ new_venv/
 new_venv
 .idea/
 .new_venv/
+word_cloud
+word_cloud/
+*.csv
+
