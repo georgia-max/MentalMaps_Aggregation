@@ -4,7 +4,7 @@ import numpy as np
 import networkx as nx
 import itertools as it
 
-def read_cld_file(file_path):
+def read_cld_file(file_path: str) -> pd.DataFrame:
     """
     Reads a Vensim .txt file and extracts the content on variable names and links.
     :param: file_path
@@ -166,3 +166,26 @@ def get_cld(df):
     d = get_dict_of_dicts(df_subset)
     return d
 
+
+
+def generate_dataframe(cld_data):
+    """
+    Generates a DataFrame from the CLD data in the format (source, target, weight, source_name, target_name).
+    """
+    # Unpack the cld_data
+    dict_vars_name, d = cld_data
+
+    # Create a list of tuples (source, target, weight)
+    edges = []
+    for source, targets in d.items():
+        for target, weight in targets.items():
+            edges.append((source, target, weight))
+
+    # Create a DataFrame from the list of edges
+    df = pd.DataFrame(edges, columns=['source', 'target', 'weight'])
+
+    # Add variable names
+    df['source_name'] = df['source'].map(dict_vars_name)
+    df['target_name'] = df['target'].map(dict_vars_name)
+
+    return df
