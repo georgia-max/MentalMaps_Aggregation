@@ -3,7 +3,7 @@ import pandas as pd
 import pickle
 
 from parse_cld import read_cld_file, get_cld_df, get_dict_to_vars
-from parse_cld import get_adjacency_matrix, get_polarity_matrix, generate_dataframe
+from parse_cld import get_adjacency_matrix, get_polarity_matrix, get_dataframe
 
 
 class TestParseCLD(unittest.TestCase):
@@ -96,18 +96,18 @@ class TestGenerateDataframe(unittest.TestCase):
 )
 
     def test_generate_dataframe_columns(self):
-        df = generate_dataframe(self.cld_data)
+        dict_var_name, df = get_dataframe(self.cld_data)
         expected_columns = ['source', 'target', 'weight', 'source_name', 'target_name']
         print(df)
         self.assertEqual(list(df.columns), expected_columns)
 
     def test_generate_dataframe_shape(self):
-        df = generate_dataframe(self.cld_data)
+        df = get_dataframe(self.cld_data)
         expected_shape = (7, 5)
         self.assertEqual(df.shape, expected_shape)
 
     def test_generate_dataframe_values(self):
-        df = generate_dataframe(self.cld_data)
+        dict_var_name, df = get_dataframe(self.cld_data)
 
         expected_values = ['1', '2', {'weight': 1}, 'rabbit population', 'birth']
   
@@ -115,8 +115,14 @@ class TestGenerateDataframe(unittest.TestCase):
 
     def test_generate_dataframe_empty_input(self):
         cld_data = ({}, {})
-        df = generate_dataframe(cld_data)
+        dict_var_name, df = get_dataframe(cld_data)
         self.assertTrue(df.empty)
+
+    def test_generate_dataframe_dict_var(self): 
+        dict_var_name, df = get_dataframe(self.cld_data)
+        expected_dict = {'1': 'rabbit population', '2': 'birth', '5': 'deaths', '8': 'food', '10': 'fox population', '12': 'numbers of hunts'}
+        self.assertEqual(dict_var_name, expected_dict)
+
 
 
 if __name__ == '__main__':

@@ -168,24 +168,39 @@ def get_cld(df):
 
 
 
-def generate_dataframe(cld_data):
+def get_dataframe(cld_dict):
     """
     Generates a DataFrame from the CLD data in the format (source, target, weight, source_name, target_name).
+    Args: 
+        cld_data (dictionary): A dictionary that represents the CLD matrix 
+    Returns:
+        pd.DataFrame: A DataFrame containing the CLD data in the specified format.
     """
     # Unpack the cld_data
-    dict_vars_name, d = cld_data
+    dict_var_name, d = cld_dict
+    # print(dict_vars_name)
+    # print(d)
+    # get the second dictionary, where it stored the links and weights
+
 
     # Create a list of tuples (source, target, weight)
     edges = []
     for source, targets in d.items():
-        for target, weight in targets.items():
+        for target, weight_dict in targets.items():
+            weight = weight_dict['weight']
+            
             edges.append((source, target, weight))
 
     # Create a DataFrame from the list of edges
-    df = pd.DataFrame(edges, columns=['source', 'target', 'weight'])
+    df = pd.DataFrame(edges, columns=['from', 'to', 'polarity_type'])
+    df['links'] = 1
+    # get column weight as int 
+    # df['weight'] = df['weight'].astype(int)
+    # print(df)
+    # print(df.info())
 
-    # Add variable names
-    df['source_name'] = df['source'].map(dict_vars_name)
-    df['target_name'] = df['target'].map(dict_vars_name)
+    # # Add variable names
+    # df['source_name'] = df['source'].map(dict_vars_name)
+    # df['target_name'] = df['target'].map(dict_vars_name)
 
-    return df
+    return dict_var_name, df
