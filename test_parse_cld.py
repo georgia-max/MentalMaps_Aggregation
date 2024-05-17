@@ -1,6 +1,6 @@
 import unittest
 import pandas as pd
-from parse_cld import read_cld_file, get_cld_df, get_dict_to_vars, get_adjacency_matrix, get_polarity_matrix
+from py_scripts.parse_cld import read_cld_file, get_cld_df, get_dict_to_vars, get_adjacency_matrix, get_polarity_matrix
 
 
 class TestParseCLD(unittest.TestCase):

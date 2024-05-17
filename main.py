@@ -5,7 +5,7 @@ import pickle
 import sys
 import time
 import os
-import parse_cld
+import py_scripts.parse_cld as parse_cld
 import cld_nx
 import traceback
 
