@@ -204,3 +204,105 @@ def get_dataframe(cld_dict):
     # df['target_name'] = df['target'].map(dict_vars_name)
 
     return dict_var_name, df
+
+
+def get_duplicate_theme_no(df):
+    """
+    Get the list of duplicate theme from the input DataFrame.
+    :param df:
+    :return:
+    """
+    # get all the duplicate theme no 
+    df_theme_no = df['theme'].value_counts()
+    duplicate_theme_no = df_theme_no[df_theme_no > 1].index.tolist()
+    return duplicate_theme_no
+
+
+# functions for aggregateCLD.ipynb 
+
+def get_theme_cld(cld_dict, df_theme ): 
+    """
+    Get the single theme CLD from the input DataFrame.
+    :param df:
+    :return:
+    """
+    dict_vars, df = get_dataframe(cld_dict)
+
+    vars_cld = pd.DataFrame.from_dict(dict_vars, orient='index').reset_index()#.columns(['Vensim Var No.', 'Var Name'])
+    # rename columns 
+    vars_cld.columns = ['vensim_var_no','var_name']
+    # turn all the variable names to lowercap 
+    vars_cld['var_name'] = vars_cld['var_name'].str.lower()
+    # delete the "" sign 
+    vars_cld['var_name'] = vars_cld['var_name'].str.replace('"', '')
+
+    df_aggregate_merge = pd.merge(df_theme, vars_cld, left_on='variable', right_on='var_name', how='right')
+
+    # create a new dictionary the keys in the vensim vars no, the values is the theme column, if the value is nan, the value is variable 
+    theme_dict = {}
+    for index, row in df_aggregate_merge.iterrows():
+        if pd.isna(row['theme']):
+            theme_dict[row['vensim_var_no']] = row['var_name']
+        else:
+            theme_dict[row['vensim_var_no']] = row['theme']
+
+    df_aggregate_merge['vensim_var_no'] = df_aggregate_merge['vensim_var_no'].astype(int)
+    list_of_duplicate_themes = get_duplicate_theme_no(df_aggregate_merge)
+
+    theme_no_dict = {}
+    for i, val in enumerate(list_of_duplicate_themes):
+        theme_no_dict[val] = max(df_aggregate_merge['vensim_var_no']) + i + 1
+
+    df_aggregate_merge['theme_no'] = df_aggregate_merge['theme'].map(theme_no_dict)
+
+
+    for i, row in df_aggregate_merge.iterrows():
+        if pd.isna(row['theme_no']):
+            df_aggregate_merge.at[i, 'theme_no'] = row['vensim_var_no']
+
+
+    df_aggregate_merge['theme_no'] = df_aggregate_merge['theme_no'].astype(int)
+
+    theme_org_new_dict = dict(zip(df_aggregate_merge['vensim_var_no'], df_aggregate_merge['theme_no']))
+
+    new_df = df.copy()
+    # change all data in df to int 
+    new_df = new_df.astype(int)
+    #swap the from column in df to new number based on theme_no_number_dict
+    new_df['from'] = new_df['from'].map(theme_org_new_dict)
+    new_df['to'] = new_df['to'].map(theme_org_new_dict)
+
+    merge_df = new_df.groupby(['from', 'to']).sum().reset_index()
+
+    pol_mx = get_adjacency_matrix(merge_df)
+    # change theme dict keys to int 
+    theme_dict = {int(k): v for k, v in theme_dict.items()}
+    pol_mx.columns = pol_mx.columns.map(theme_dict)
+
+    pol_mx.index = pol_mx.index.map(theme_dict)
+
+    return pol_mx
+
+
+
+def get_combine_matrix(matrix1, matrix2): 
+
+
+    def combine_non_nan(s1, s2):
+
+        if pd.isna(s1).all():
+            return s2
+        elif pd.isna(s2).all():
+            return s1
+        else:
+            return s1 + s2
+
+    if matrix2.empty :
+        return matrix1
+
+    else: 
+        combined_matrix = matrix1.combine(matrix2, combine_non_nan, overwrite = False)
+        combined_matrix = combined_matrix.fillna(matrix1)
+        combined_matrix = combined_matrix.fillna(matrix2)
+
+        return combined_matrix 

@@ -3,7 +3,8 @@ import pandas as pd
 import pickle
 
 from parse_cld import read_cld_file, get_cld_df, get_dict_to_vars
-from parse_cld import get_adjacency_matrix, get_polarity_matrix, get_dataframe
+from parse_cld import get_adjacency_matrix, get_polarity_matrix
+from parse_cld import get_dataframe, get_combine_matrix
 
 
 class TestParseCLD(unittest.TestCase):
@@ -123,6 +124,31 @@ class TestGenerateDataframe(unittest.TestCase):
         expected_dict = {'1': 'rabbit population', '2': 'birth', '5': 'deaths', '8': 'food', '10': 'fox population', '12': 'numbers of hunts'}
         self.assertEqual(dict_var_name, expected_dict)
 
+
+class TestGetCombineMatrix(unittest.TestCase):
+    def setUp(self): 
+
+        self.matrix1 = [[ 1, 1, 1, 0, 1],
+                        [1, 0, 1, 1, 1],
+                        [ 1, 0, 0, 0, 0],
+                        [1, 1, 0, 1, 0],
+                        [1, 0, 0, 1, 0]]
+
+        self.matrix1 = pd.DataFrame(self.matrix1, columns=['a', 'b', 'c', 'd', 'e'])
+        self.matrix1.index = ['a', 'b', 'c', 'd', 'e']
+
+        self.matrix2 = [[ 0, 1, 1, 0, 1],
+                        [1, 0, 1, 1, 1],
+                        [ 1, 0, 0, 0, 0],
+                        [1, 1, 0, 1, 0],
+                        [1, 0, 0, 1, 1]]
+
+        self.matrix2 = pd.DataFrame(self.matrix2, columns=['z', 'd', 'c', 'b', 'a'])
+        self.matrix2.index = ['z', 'd', 'c', 'b', 'a']        
+    
+    def test_get_combine_matrix(self): 
+        combined_matrix = get_combine_matrix(self.matrix1, self.matrix2)
+        self.assertEqual(combined_matrix.shape, (6,6) )
 
 
 if __name__ == '__main__':
