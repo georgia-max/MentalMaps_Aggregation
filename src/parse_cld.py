@@ -237,14 +237,8 @@ def get_theme_cld(cld_dict, df_theme ):
     vars_cld['var_name'] = vars_cld['var_name'].str.replace('"', '')
 
     df_aggregate_merge = pd.merge(df_theme, vars_cld, left_on='variable', right_on='var_name', how='right')
-
-    # create a new dictionary the keys in the vensim vars no, the values is the theme column, if the value is nan, the value is variable 
-    theme_dict = {}
-    for index, row in df_aggregate_merge.iterrows():
-        if pd.isna(row['theme']):
-            theme_dict[row['vensim_var_no']] = row['var_name']
-        else:
-            theme_dict[row['vensim_var_no']] = row['theme']
+    # print(df_aggregate_merge)
+    
 
     df_aggregate_merge['vensim_var_no'] = df_aggregate_merge['vensim_var_no'].astype(int)
     list_of_duplicate_themes = get_duplicate_theme_no(df_aggregate_merge)
@@ -263,7 +257,20 @@ def get_theme_cld(cld_dict, df_theme ):
 
     df_aggregate_merge['theme_no'] = df_aggregate_merge['theme_no'].astype(int)
 
+    theme_dict = {}
+    for index, row in df_aggregate_merge.iterrows():
+        if pd.isna(row['theme']):
+            theme_dict[row['theme_no']] = row['var_name']
+        else:
+            theme_dict[row['theme_no']] = row['theme']
+
+    theme_dict = {int(k): v for k, v in theme_dict.items()}
+
+
+
     theme_org_new_dict = dict(zip(df_aggregate_merge['vensim_var_no'], df_aggregate_merge['theme_no']))
+    theme_org_new_dict = {int(k): v for k, v in theme_org_new_dict.items()}
+
 
     new_df = df.copy()
     # change all data in df to int 
@@ -273,8 +280,24 @@ def get_theme_cld(cld_dict, df_theme ):
     new_df['to'] = new_df['to'].map(theme_org_new_dict)
 
     merge_df = new_df.groupby(['from', 'to']).sum().reset_index()
+    
+    return merge_df, theme_dict
 
-    pol_mx = get_adjacency_matrix(merge_df)
+
+def get_aggregate_adjacency_mx(merge_df, theme_dict): 
+
+    adj_mx = get_adjacency_matrix(merge_df)
+    # change theme dict keys to int 
+    theme_dict = {int(k): v for k, v in theme_dict.items()}
+    adj_mx.columns = adj_mx.columns.map(theme_dict)
+
+    adj_mx.index = adj_mx.index.map(theme_dict)
+
+    return adj_mx
+
+def get_aggregate_polarity_mx(merge_df, theme_dict): 
+
+    pol_mx = get_polarity_matrix(merge_df)
     # change theme dict keys to int 
     theme_dict = {int(k): v for k, v in theme_dict.items()}
     pol_mx.columns = pol_mx.columns.map(theme_dict)
@@ -282,7 +305,6 @@ def get_theme_cld(cld_dict, df_theme ):
     pol_mx.index = pol_mx.index.map(theme_dict)
 
     return pol_mx
-
 
 
 def get_combine_matrix(matrix1, matrix2): 
