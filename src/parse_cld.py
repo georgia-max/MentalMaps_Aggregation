@@ -173,7 +173,14 @@ def get_dict_of_dicts(df_subset):
 
     nested_dict = {}
 
-# Iterate over the rows of the DataFrame
+    # delete if there are duplicate rows
+    df_subset = df_subset.drop_duplicates()
+
+    # delete rows with nan 
+    df_subset = df_subset.dropna()
+
+
+    # Iterate over the rows of the DataFrame
     for index, row in df_subset.iterrows():
         from_value = row['from']
         to_value = row['to']
@@ -184,6 +191,7 @@ def get_dict_of_dicts(df_subset):
             nested_dict[from_value] = {}
         
         nested_dict[from_value][to_value] = {'weight': weight_value}
+    
 
     return nested_dict
 
@@ -266,8 +274,16 @@ def get_duplicate_theme_no(df):
 def get_theme_cld(cld_dict, df_theme ): 
     """
     Get the single theme CLD from the input DataFrame.
-    :param df:
-    :return:
+    
+    Args:
+        cld_dict (dict): A dictionary containing the CLD data.
+        df_theme (pandas.DataFrame): A DataFrame containing the theme information.
+    
+    Returns:
+        tuple: A tuple containing the following:
+            - merge_df (pandas.DataFrame): A DataFrame containing the merged CLD data.
+            - theme_dict (dict): A dictionary mapping theme numbers to theme names.
+
     """
     dict_vars, df = get_dataframe(cld_dict)
 
@@ -280,7 +296,6 @@ def get_theme_cld(cld_dict, df_theme ):
     vars_cld['var_name'] = vars_cld['var_name'].str.replace('"', '')
 
     df_aggregate_merge = pd.merge(df_theme, vars_cld, left_on='variable', right_on='var_name', how='right')
-    # print(df_aggregate_merge)
     
 
     df_aggregate_merge['vensim_var_no'] = df_aggregate_merge['vensim_var_no'].astype(int)
@@ -310,7 +325,7 @@ def get_theme_cld(cld_dict, df_theme ):
     theme_dict = {int(k): v for k, v in theme_dict.items()}
 
 
-
+    # get dictionary of the origininla vensim var number and the new theme number
     theme_org_new_dict = dict(zip(df_aggregate_merge['vensim_var_no'], df_aggregate_merge['theme_no']))
     theme_org_new_dict = {int(k): v for k, v in theme_org_new_dict.items()}
 

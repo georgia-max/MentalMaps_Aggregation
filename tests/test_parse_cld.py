@@ -91,9 +91,9 @@ class TestGetDictOfDicts(unittest.TestCase):
 
     def test_get_dict_of_dicts_duplicate_entries(self):
         df_duplicate = pd.DataFrame({
-            'from': [1, 2, 3, 1, 2, 1, 2],
-            'to': [2, 3, 1, 3, 1, 2, 3],
-            'weight': [1, 2, 3, 4, 5, 6, 7]
+            'from':     [1, 2, 3, 1, 2, 1, 2, 2],
+            'to':       [2, 3, 1, 3, 1, 2, 3, 3],
+            'weight':   [1, 2, 3, 4, 5, 6, 7, 2]
         })
         expected_output = {
             1: {2: {'weight': 6}, 3: {'weight': 4}},
@@ -102,7 +102,20 @@ class TestGetDictOfDicts(unittest.TestCase):
         }
         result = parse_cld.get_dict_of_dicts(df_duplicate)
         self.assertEqual(result, expected_output)
-
+    def test_get_dict_of_dicts_nan_values(self):
+        df_nan = pd.DataFrame({
+            'from': [1, 2, 3, 1, 2, 1, 2],
+            'to': [2, 3, 1, None, 1, 2, 3],
+            'weight': [1, 2, 3, 4, 5, 6, 7]
+        })
+            
+        expected_output = {
+            1: {2: {'weight': 6}},
+            2: {3: {'weight': 7}, 1: {'weight': 5}},
+            3: {1: {'weight': 3}}
+        }
+        result = parse_cld.get_dict_of_dicts(df_nan)
+        self.assertEqual(result, expected_output)
 
 class TestGenerateDataframe(unittest.TestCase):
 

@@ -4,9 +4,8 @@
 
 # Define the directories 
 
-# TODO: Somehow some of the files in PineRidge are not parsing correctly 
 INPUT_DIR="Dataset/SYNCH/RC"
-OUTPUT_DIR="Output/SYNCH/RC"
+OUTPUT_DIR="Output/SYNCH/JSON_file/RC"
 
 # Create the output directory if it doesn't already exist
 mkdir -p "$OUTPUT_DIR"

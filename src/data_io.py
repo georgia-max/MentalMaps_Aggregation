@@ -15,4 +15,3 @@ def read_json(folder_path, data_dict):
 
     return data_dict
 
-p
