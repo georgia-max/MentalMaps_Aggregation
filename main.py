@@ -7,9 +7,9 @@ import time
 import os
 
 # sys.path.append(os.path.abspath(os.path.join('..', 'src')))
-
-from src.parse_cld import read_cld_file, get_cld_df, get_dict_to_vars, get_adjacency_matrix, get_polarity_matrix, get_cld
-from src.cld_nx import draw_labeled_multigraph
+from src import parse_cld, cld_nx
+# from src.parse_cld import read_cld_file, get_cld_df, get_dict_to_vars, get_adjacency_matrix, get_polarity_matrix, get_cld
+# from src.cld_nx import draw_labeled_multigraph
 import traceback
 
 def main():
@@ -28,10 +28,10 @@ def main():
         output_file = sys.argv[2]
         file_name = output_file.split(".")[0]
 
-        df = read_cld_file(input_file)
-        dict_vars_name, dict_var = get_dict_to_vars(df)
+        df = parse_cld.read_cld_file(input_file)
+        dict_vars_name, dict_var = parse_cld.get_dict_to_vars(df)
 
-        d = get_cld(df)
+        d = parse_cld.get_cld(df)
 
         # combine the variable names dict and cld data
         cld_data = [dict_vars_name, d]
@@ -41,7 +41,7 @@ def main():
 
         G = nx.MultiDiGraph(d)
 
-        draw_labeled_multigraph(G, "weight", dict_vars_name)
+        cld_nx.draw_labeled_multigraph(G, "weight", dict_vars_name)
         # plt.show()
         plt.savefig(file_name + ".png")
 

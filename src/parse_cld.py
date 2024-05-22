@@ -170,19 +170,22 @@ def get_dict_of_dicts(df_subset):
     :return: dictionary of dictionaries
 
     """
-    # df_subset.to_csv("tt.csv")
-    # print(df_subset)
-    # find rows when the column "to" and "from" are the same 
-    # df_tt = df_subset[df_subset['from'] == df_subset['to']]
-    # print(df_tt)
-    # d = df_subset.groupby('from').apply(lambda x: x.set_index('to').to_dict(orient='index'),
-    #                                     include_groups=False).to_dict()
-    grouped = df_subset.groupby('from').apply(lambda x: x.set_index('to').to_dict(orient='index'), include_groups=False)
-    print(grouped)
-    d = grouped.to_dict()
-    
-    print(d)
-    return d
+
+    nested_dict = {}
+
+# Iterate over the rows of the DataFrame
+    for index, row in df_subset.iterrows():
+        from_value = row['from']
+        to_value = row['to']
+        weight_value = row['weight']
+        
+        # Create the nested dictionary structure
+        if from_value not in nested_dict:
+            nested_dict[from_value] = {}
+        
+        nested_dict[from_value][to_value] = {'weight': weight_value}
+
+    return nested_dict
 
 def get_cld(df):
     """
@@ -194,14 +197,14 @@ def get_cld(df):
     df_cld = get_cld_df(df, dict_vars_name,  dict_var)
     # print(df_cld)
 
-    # my_dict = get_dict_to_vars(df)
-
     df_subset = df_cld[['from', 'to', 'polarity_type']]
 
     # Change the column name polarity type of weight
     df_subset = df_subset.rename(columns={'polarity_type': 'weight'})
+    d = get_dict_of_dicts(df_subset)
+
  
-    d =  (df_subset)
+    # d =  (df_subset)
     return d
 
 
