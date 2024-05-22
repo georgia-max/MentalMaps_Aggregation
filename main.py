@@ -5,14 +5,16 @@ import pickle
 import sys
 import time
 import os
-import py_scripts.parse_cld as parse_cld
-import cld_nx
+
+# sys.path.append(os.path.abspath(os.path.join('..', 'src')))
+
+from src.parse_cld import read_cld_file, get_cld_df, get_dict_to_vars, get_adjacency_matrix, get_polarity_matrix, get_cld
+from src.cld_nx import draw_labeled_multigraph
 import traceback
 
 def main():
 
-    # for i in tqdm(range(100), desc=f"Loading..."):
-    #     pass
+
     try:
         # Check if the file exists
         if not os.path.isfile(sys.argv[1]):
@@ -26,9 +28,10 @@ def main():
         output_file = sys.argv[2]
         file_name = output_file.split(".")[0]
 
-        df = parse_cld.read_cld_file(input_file)
-        d = parse_cld.get_cld(df)
-        dict_vars_name = parse_cld.get_dict_to_vars(df)
+        df = read_cld_file(input_file)
+        dict_vars_name, dict_var = get_dict_to_vars(df)
+
+        d = get_cld(df)
 
         # combine the variable names dict and cld data
         cld_data = [dict_vars_name, d]
@@ -37,7 +40,8 @@ def main():
             pickle.dump(cld_data, f)
 
         G = nx.MultiDiGraph(d)
-        cld_nx.draw_labeled_multigraph(G, "weight", dict_vars_name)
+
+        draw_labeled_multigraph(G, "weight", dict_vars_name)
         # plt.show()
         plt.savefig(file_name + ".png")
 

@@ -49,8 +49,35 @@ def read_cld_file(file_path: str) -> pd.DataFrame:
 
     return df
 
+def get_dict_to_vars(df):
+    """
+    Creates a dictionary mapping variable names to their index in the DataFrame.
+    :param df_vars: DataFrame containing variable information
+    :return: dictionary mapping variable names to their index
+    """
+    # in the txt file, 10 means it is a variable.
 
-def get_cld_df(df):
+    df_vars = df.loc[df[0]==10,  ]
+    # Create a dictionary based on  dataframe column 1 and 2
+    dict_var = df_vars.set_index(1)[2].to_dict()
+
+    # turn all the variable names in the value to lowercase 
+    dict_var = {k: v.lower() for k, v in dict_var.items()}
+
+    # delete unneccessary " and space sign in the variable names in the dictionary 
+    dict_var = {k: v.replace('"', '') for k, v in dict_var.items()}
+    dict_var = {k: v.replace('"', '') for k, v in dict_var.items()}
+
+    # get unique variable names 
+    unique_var_values = sorted(set(dict_var.values()))
+    # create a dictionary starting from 1, the keys is the number the value is the variable name 
+    dict_var_final= {k: v for k, v in enumerate(unique_var_values, 1)}
+    dict_var_final 
+    return dict_var_final,  dict_var  
+
+
+
+def get_cld_df(df, dict_var, dict_var_final) :
     """
     Extracts organize and transform the CLD data from the input DataFrame.
     :param df:
@@ -61,24 +88,22 @@ def get_cld_df(df):
     df_new = df.loc[df[0]== 1,  ]
     df_new = df_new[[0, 1, 2, 3, 6]]
     # Give dataframe new column names
-    df_new = df_new.rename(columns={0: 'type', 1: 'index',2: 'from', 3: 'to', 6: 'polarity'})
+    df_new = df_new.rename(columns={0: 'type', 1: 'index',2: 'from_org', 3: 'to_org', 6: 'polarity'})
     df_new['polarity'] = df_new['polarity'].astype(int)
     df_new['links'] = 1
     df_new['polarity_type'] = np.where(df_new['polarity'] == 43, 1,
                                          np.where(df_new['polarity'] == 45, -1, 3))
+
+    df_new['from_var'] = df_new['from_org'].map(dict_var)
+    df_new['to_var'] = df_new['to_org'].map(dict_var)
+
+    df_new['from'] = df_new['from_var'].map( {v: k for k, v in dict_var_final.items()})
+    df_new['to'] = df_new['to_var'].map( {v: k for k, v in dict_var_final.items()})
+    # drop columns from_org, to_org 
+    df_new = df_new.drop(columns=['from_org', 'to_org'])
     return df_new
 
-def get_dict_to_vars(df):
-    """
-    Creates a dictionary mapping variable names to their index in the DataFrame.
-    :param df_vars: DataFrame containing variable information
-    :return: dictionary mapping variable names to their index
-    """
-    # in the txt file, 10 means it is a variable.
-    if df[0].eq(10).any():
-        return df.loc[df[0] == 10].set_index(1)[2].to_dict()
-    else:
-        return {}
+
 
 def get_adjacency_matrix(df_new):
     """
@@ -145,8 +170,18 @@ def get_dict_of_dicts(df_subset):
     :return: dictionary of dictionaries
 
     """
-    d = df_subset.groupby('from').apply(lambda x: x.set_index('to').to_dict(orient='index'),
-                                        include_groups=False).to_dict()
+    # df_subset.to_csv("tt.csv")
+    # print(df_subset)
+    # find rows when the column "to" and "from" are the same 
+    # df_tt = df_subset[df_subset['from'] == df_subset['to']]
+    # print(df_tt)
+    # d = df_subset.groupby('from').apply(lambda x: x.set_index('to').to_dict(orient='index'),
+    #                                     include_groups=False).to_dict()
+    grouped = df_subset.groupby('from').apply(lambda x: x.set_index('to').to_dict(orient='index'), include_groups=False)
+    print(grouped)
+    d = grouped.to_dict()
+    
+    print(d)
     return d
 
 def get_cld(df):
@@ -155,7 +190,9 @@ def get_cld(df):
     :param df:
     :return:
     """
-    df_cld = get_cld_df(df)
+    dict_var, dict_vars_name = get_dict_to_vars(df)
+    df_cld = get_cld_df(df, dict_vars_name,  dict_var)
+    # print(df_cld)
 
     # my_dict = get_dict_to_vars(df)
 
@@ -163,8 +200,11 @@ def get_cld(df):
 
     # Change the column name polarity type of weight
     df_subset = df_subset.rename(columns={'polarity_type': 'weight'})
-    d = get_dict_of_dicts(df_subset)
+ 
+    d =  (df_subset)
     return d
+
+
 
 
 

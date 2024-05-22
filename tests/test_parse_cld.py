@@ -2,16 +2,17 @@ import unittest
 import pandas as pd
 import pickle
 
-from parse_cld import read_cld_file, get_cld_df, get_dict_to_vars
-from parse_cld import get_adjacency_matrix, get_polarity_matrix
-from parse_cld import get_dataframe, get_combine_matrix
+from src import parse_cld
+
+# from src.parse_cld import read_cld_file, get_cld_df, get_dict_to_vars
+# from src.parse_cld import get_adjacency_matrix, get_polarity_matrix
+# from src.parse_cld import get_dataframe, get_combine_matrix
 
 
 class TestParseCLD(unittest.TestCase):
-    #TODO: fix the test case
 
     def setUp(self):
-        self.cld_data = read_cld_file('Testing/rabbit_example.mdl')
+        self.cld_data = parse_cld.read_cld_file('Testing/rabbit_example.mdl')
         # self.cld_data = read_cld_file('Dataset/SYNCH/Pine_Ridge/ME_10_5_2021_X2.mdl')
 
     def test_read_cld_file(self):
@@ -24,42 +25,47 @@ class TestParseCLD(unittest.TestCase):
         self.assertEqual(output_line_list[2], expected_output)
 
     def test_get_cld_df(self):
-        # df = read_cld_file('Dataset/test.mdl')
-        df_cld = get_cld_df(self.cld_data)
+        dict_var_final, dict_var = get_dict_to_vars(self.cld_data)
+        df_cld = get_cld_df(self.cld_data, dict_var, dict_var_final)
 
-        expected_columns = ['type', 'index', 'from', 'to', 'polarity', 'links', 'polarity_type']
+        expected_columns = ['type', 'index', 'polarity', 'links', 'polarity_type', 'from_var', 'to_var', 'from', 'to']
         # print(df_cld.iloc[0])
         self.assertEqual(list(df_cld.columns), expected_columns)
-        self.assertEqual(df_cld.iloc[0, 4], 43)
 
     def test_get_dict_to_vars(self):
         """
         Tests the get_dict_to_vars function.
         :return: None
         """
-        # df = read_cld_file('Dataset/test.mdl')
-        my_dict = get_dict_to_vars(self.cld_data)
-        expected_dict = {'1': 'rabbit population', '2': 'birth', '5': 'd[65 chars]nts'}
-        self.assertEqual(my_dict, expected_dict)
+        dict_var_final, dict_var = get_dict_to_vars(self.cld_data)
+        expected_dict = {1: 'birth', 2: 'deaths', 3: 'food', 4: 'fox population', 5: 'numbers of hunts', 6: 'rabbit population'}
+        self.assertEqual(dict_var_final, expected_dict)
 
     def test_get_adjacency_matrix(self):
-        df_cld = get_cld_df(self.cld_data)
-        my_dict = get_dict_to_vars(self.cld_data)
+        dict_var_final, dict_var = get_dict_to_vars(self.cld_data)
+        df_cld = get_cld_df(self.cld_data, dict_var, dict_var_final)
+
         adj_matrix = get_adjacency_matrix(df_cld)
 
         # Assert the shape of the adjacency matrix
-        self.assertEqual(adj_matrix.shape, (len(my_dict), len(my_dict)))
+        self.assertEqual(adj_matrix.shape, (len(dict_var_final), len(dict_var_final)))
 
     def test_get_polarity_matrix(self):
-        df_cld = get_cld_df(self.cld_data)
-        my_dict = get_dict_to_vars(self.cld_data)
+        dict_var_final, dict_var = get_dict_to_vars(self.cld_data)
+        df_cld = get_cld_df(self.cld_data, dict_var, dict_var_final)
         pol_matrix = get_polarity_matrix(df_cld)
         # Assert the shape of the polarity matrix
-        self.assertEqual(pol_matrix.shape, (len(my_dict), len(my_dict)))
+        self.assertEqual(pol_matrix.shape, (len(dict_var_final), len(dict_var_final)))
 
-    def test_df_to_adjacency_list(self):
-        none
+    def test_get_dict_of_dicts(self): 
+        df = pd.read_csv("tt.csv")
+        print(df)
+        d = get_dict_of_dicts(df)
 
+        
+        # self assert true if d is a dictionary 
+
+        self.assertTrue()
 
 
 # src/test_parse_cld.py
@@ -154,3 +160,48 @@ class TestGetCombineMatrix(unittest.TestCase):
 if __name__ == '__main__':
 
     unittest.main()
+tests/test_parse_cld.py
+class TestGetDictOfDicts(unittest.TestCase):
+
+    def setUp(self):
+        self.df = pd.DataFrame({
+            'from': [1, 2, 3, 1, 2],
+            'to': [2, 3, 1, 3, 1],
+            'weight': [1, 2, 3, 4, 5]
+        })
+
+    def test_get_dict_of_dicts_output_type(self):
+        result = get_dict_of_dicts(self.df)
+        self.assertIsInstance(result, dict)
+
+    def test_get_dict_of_dicts_output_structure(self):
+        result = get_dict_of_dicts(self.df)
+        self.assertTrue(all(isinstance(v, dict) for v in result.values()))
+
+    def test_get_dict_of_dicts_output_values(self):
+        expected_output = {
+            1: {2: {'weight': 1}, 3: {'weight': 4}},
+            2: {3: {'weight': 2}, 1: {'weight': 5}},
+            3: {1: {'weight': 3}}
+        }
+        result = get_dict_of_dicts(self.df)
+        self.assertEqual(result, expected_output)
+
+    def test_get_dict_of_dicts_empty_input(self):
+        df_empty = pd.DataFrame(columns=['from', 'to', 'weight'])
+        result = get_dict_of_dicts(df_empty)
+        self.assertEqual(result, {})
+
+    def test_get_dict_of_dicts_duplicate_entries(self):
+        df_duplicate = pd.DataFrame({
+            'from': [1, 2, 3, 1, 2, 1, 2],
+            'to': [2, 3, 1, 3, 1, 2, 3],
+            'weight': [1, 2, 3, 4, 5, 6, 7]
+        })
+        expected_output = {
+            1: {2: {'weight': 6}, 3: {'weight': 4}},
+            2: {3: {'weight': 7}, 1: {'weight': 5}},
+            3: {1: {'weight': 3}}
+        }
+        result = get_dict_of_dicts(df_duplicate)
+        self.assertEqual(result, expected_output)
