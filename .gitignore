@@ -5,14 +5,16 @@
 *.pyc
 *.png
 *.json
-Output/
-Dataset/
-
-new_venv/
-new_venv
-.idea/
-.new_venv/
-word_cloud
-word_cloud/
+*.xlsx
 *.csv
+
+results/
+data/
+gravis_example/
+
+.venv/
+.venv
+.idea/
+
+
 

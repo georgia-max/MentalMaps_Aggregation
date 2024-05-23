@@ -80,6 +80,9 @@ def get_dict_to_vars(df):
 def get_cld_df(df, dict_var, dict_var_final) :
     """
     Extracts organize and transform the CLD data from the input DataFrame.
+    Get the polarity type, when = 32, the polarity is positive(+), 
+    when = 33, the polarity is negative (-1), when = 34, the polarity is neutral(3).
+
     :param df:
     :return: df_new
     """
