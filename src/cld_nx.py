@@ -57,45 +57,46 @@ def gravis_settings(g):
     # initialise colour helper 
     vals = nx.get_edge_attributes(g, 'weight').values()
 
-    # if vals  = 1 color is red, -1 color is blue, 3 is black 
-    colors = {1: 'red', -1: 'blue', 3: 'black', 2: 'green'} #TODO: check what does 2 means 
+    # node feature
+    node_color = {'org': 'blue', 'theme': 'green'}
+
+    for node, data in g.nodes(data=True):
+        data['color'] = node_color[data['level']]
+        data['click'] = (
+            "\nNode Features:" +
+            f"\nCLD: {data['cld']}" + 
+            f"\nLevel: {data['level']}"
+        )
+        data['title'] = (
+            "\nNode Features:" +
+            f"\nCLD: {data['cld']}" + 
+            f"\nLevel: {data['level']}" # + 
+        ) 
 
 
-    # get rgb string for each node
+    # edge features
+
+    colors = {1: 'red', -1: 'blue', 3: 'black'} #TODO: check what does 2 means 
+
+
     for u, v, data in g.edges(data=True):
-
         if 'weight' in data:
             if data['weight'] in colors:
-
                 data['color'] = colors[data['weight']]
             else:
                 data['color'] = 'green'
         else:
             data['color'] = 'black'
-
-    # node feature
-    for node, data in g.nodes(data=True):
-        data['click'] = (
-            "\nNode Features:" +
-            f"\nCLD: {data['cld']}" + 
-            f"\nLevel: {data['level']}" #+ 
-        )
-
-    # edge features
-    for u, v, data in g.edges(data=True):
+        
         data['click'] = (
                 f"\nEdge Features:" + 
                 f"\nCLD: {data['cld']}" + 
                 f"\nPolarity Sign: {data['weight']}"
             )
 
-    for node, data in g.nodes(data=True):
-        data['title'] = (
-            "\nNode Features:" +
-            f"\nCLD: {data['cld']}" + 
-            f"\nLevel: {data['level']}" # + 
-        ) 
-    
+        
+
+
 
 
 def cld_nx_properties(G): 
@@ -126,7 +127,7 @@ def cld_nx_node_properties(G):
     print("Node data:")
     print("-------------")
     print()
-    for node, attributes in list(G.nodes.data())[:3]: 
+    for node, attributes in list(G.nodes.data())[:20]: 
         print('Type:', type(node), type(attributes))
         print('Var Name:', node)
         print('Attributes:', attributes)
@@ -137,7 +138,7 @@ def cld_nx_edge_properties(G):
     print("Edge data:")
     print("-------------")
 
-    for source, target, attributes in list(G.edges.data())[:3]:
+    for source, target, attributes in list(G.edges.data())[:20]:
         print('Type:', type(source), type(target), type(attributes))
         print('Source:', source)
         print('Target:', target)
@@ -158,10 +159,13 @@ def set_node_attributes(g, unique_theme_names, cld_name: str):
         cld_name (str): The name of the CLD.
 
     """
-    nx.set_node_attributes(g, name='cld', values=  cld_name)
+    nx.set_node_attributes(g, name='cld', values= cld_name)
 
     attrs = {node: {'level': 'theme'} if node in unique_theme_names else {'level': 'org'} for node in g.nodes()}
     nx.set_node_attributes(g, attrs)
+
+    node_degree_dict = {node: {'degree': int(degree)} for node, degree in g.degree()}
+    nx.set_node_attributes(g, node_degree_dict)
 
     return g 
 
