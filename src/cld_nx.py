@@ -42,12 +42,12 @@ def draw_labeled_multigraph(G, attr_name, mapping, ax=None):
     plt.tight_layout()
     # plt.show()
 
-def get_nx_graph(d, theme_dict, unique_theme_names, cld_name: str):
+def get_nx_graph(d, theme_dict, cld_name: str, unique_theme_names):
 
     g = nx.DiGraph(d)
     # relabel the nodes to string names 
     g = nx.relabel_nodes(g, theme_dict)
-    g = set_node_attributes(g, unique_theme_names, cld_name =cld_name)
+    g = set_node_attributes(g, cld_name =cld_name, unique_theme_names = unique_theme_names)
     g = set_edge_attributes(g, cld_name =cld_name)
 
     return g
@@ -144,7 +144,7 @@ def cld_nx_edge_properties(G):
         print('Target:', target)
         print('Attributes:', attributes)
 
-def set_node_attributes(g, unique_theme_names, cld_name: str):
+def set_node_attributes(g, cld_name: str, unique_theme_names = None):
     """
     Sets the node attributes of a NetworkX graph `G`.
 
@@ -160,9 +160,9 @@ def set_node_attributes(g, unique_theme_names, cld_name: str):
 
     """
     nx.set_node_attributes(g, name='cld', values= cld_name)
-
-    attrs = {node: {'level': 'theme'} if node in unique_theme_names else {'level': 'org'} for node in g.nodes()}
-    nx.set_node_attributes(g, attrs)
+    if unique_theme_names is not None: 
+        attrs = {node: {'level': 'theme'} if node in unique_theme_names else {'level': 'org'} for node in g.nodes()}
+        nx.set_node_attributes(g, attrs)
 
     node_degree_dict = {node: {'degree': int(degree)} for node, degree in g.degree()}
     nx.set_node_attributes(g, node_degree_dict)
@@ -187,3 +187,33 @@ def set_edge_attributes(g, cld_name: str):
     return g
 
 
+def combine_graphs_with_node_attributes(graphs):
+    combined_graph = nx.DiGraph()
+
+    for g in graphs:
+        for node, attrs in g.nodes(data=True):
+            if node not in combined_graph:
+                combined_graph.add_node(node, **{k: [v] for k, v in attrs.items()})
+            else:
+                for attr, value in attrs.items():
+                    if attr in combined_graph.nodes[node]:
+                        combined_graph.nodes[node][attr].append(value)
+                    else:
+                        combined_graph.nodes[node][attr] = [value]
+        
+        for u, v, attrs in g.edges(data=True):
+            if combined_graph.has_edge(u, v):
+                for attr, value in attrs.items():
+                    if attr in combined_graph[u][v]:
+                        combined_graph[u][v][attr].append(value)
+                    else:
+                        combined_graph[u][v][attr] = [value]
+            else:
+                combined_graph.add_edge(u, v, **{k: [v] for k, v in attrs.items()})
+    
+    # Calculate sum_weighted for each edge
+    for u, v, attrs in combined_graph.edges(data=True):
+        if 'weight' in attrs:
+            combined_graph[u][v]['sum_weighted'] = sum(attrs['weight'])
+            
+    return combined_graph
