@@ -75,8 +75,9 @@ def gravis_settings(g):
 
 
     # edge features
+    # blue is positive, green is negative, black is no sign 
 
-    colors = {1: 'red', -1: 'blue', 3: 'black'} #TODO: check what does 2 means 
+    colors = {1: 'blue', -1: 'green', 3: 'black'} 
 
 
     for u, v, data in g.edges(data=True):
@@ -211,9 +212,84 @@ def combine_graphs_with_node_attributes(graphs):
             else:
                 combined_graph.add_edge(u, v, **{k: [v] for k, v in attrs.items()})
     
+
+
     # Calculate sum_weighted for each edge
     for u, v, attrs in combined_graph.edges(data=True):
         if 'weight' in attrs:
-            combined_graph[u][v]['sum_weighted'] = sum(attrs['weight'])
+            set_unique_weights = set(attrs['weight'])
+            if 2 in set_unique_weights: 
+
+                set_unique_weights.remove(2)
+            
+            if -2 in set_unique_weights: 
+
+                set_unique_weights.remove(-2)
+
+            # 0 means that there is a merge in the single CLD of -1 and 1 
+
+            
+            if  0 in set_unique_weights: 
+                combined_graph[u][v]['merge_weight'] = 0 
+                # meaning the there is both -1 and 1 in shown in the link 
+
+            elif len(set_unique_weights) == 1: 
+                # if all graphs have the same polarity sign, use it. 
+                combined_graph[u][v]['merge_weight'] = list(set_unique_weights)[0]
+            elif 3 in set_unique_weights and len(set_unique_weights) == 2: 
+                # 3 means that there is no defined sign in the org cld. Therefore
+                # we use the ones that have a sign
+                set_unique_weights.remove(3)
+                
+                combined_graph[u][v]['merge_weight'] = list(set_unique_weights)[0]
+            else: 
+                combined_graph[u][v]['merge_weight'] = 0 
+        
+
             
     return combined_graph
+
+
+# def calcuate_merged_polarity_sign(attrs): 
+#     # if the list contains only 3 or 1s 
+
+#     if set(attrs[weight]) = 1:
+#         combined_graph[u][v]['sum_weighted'] = set(attrs[weight])
+#     else
+
+
+def clean_combined_graph(combined_graph, num_aggregate_nodes = 1, num_aggregate_edges =1):
+    new_graph = nx.DiGraph()
+
+    # Add nodes to the new graph
+    for node, attrs in combined_graph.nodes(data=True):
+        # print(attrs['cld'])
+        # print(len(attrs['cld']))
+
+        if len(attrs['cld']) > num_aggregate_nodes: 
+            attrs['single_level'] = attrs.pop('level')
+            if len(attrs['single_level']) >1: 
+
+                attrs['level'] = attrs['single_level'][0]
+            else: 
+                attrs['level'] = attrs['single_level']
+            attrs['nums_cld'] = len(attrs['cld'])
+            new_graph.add_node(node, **attrs)
+
+
+
+    # Add edges to the new graph with sum_weighted as the weight
+    for u, v, attrs in combined_graph.edges(data=True):
+        if u in new_graph and v in new_graph:
+            # print(u, ",", v, attrs)
+            edge_attrs = attrs.copy()
+            edge_attrs['single_weight'] = edge_attrs.pop('weight')
+
+            edge_attrs['weight'] = edge_attrs.pop('merge_weight')
+
+            if edge_attrs['weight'] > num_aggregate_edges: 
+                new_graph.add_edge(u, v, **edge_attrs)
+
+    new_graph.remove_edges_from(nx.selfloop_edges(new_graph))
+
+    return new_graph
