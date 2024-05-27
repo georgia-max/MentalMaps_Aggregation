@@ -6,7 +6,6 @@ def read_json(folder_path, data_dict):
     for filename in os.listdir(folder_path):
         if filename.endswith('.json'):
             file_path = os.path.join(folder_path, filename)
-            print(file_path)
             with open(file_path, 'rb') as f:
                 print("load:",filename)
                 data = pickle.load(f)

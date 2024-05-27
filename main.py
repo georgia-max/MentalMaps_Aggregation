@@ -6,8 +6,14 @@ import sys
 import time
 import os
 
-# sys.path.append(os.path.abspath(os.path.join('..', 'src')))
+import gravis
+import pandas as pd
+
+from src.vensim_parser import CLDParser
 from src import parse_cld, cld_nx
+
+# sys.path.append(os.path.abspath(os.path.join('..', 'src')))
+# from src import parse_cld, cld_nx
 # from src.parse_cld import read_cld_file, get_cld_df, get_dict_to_vars, get_adjacency_matrix, get_polarity_matrix, get_cld
 # from src.cld_nx import draw_labeled_multigraph
 import traceback
@@ -22,28 +28,30 @@ def main():
 
             raise FileNotFoundError(f"File not found: {sys.argv[1]}")
 
-        # Open the file and read its contents
+
+         # Open the file and read its contents
         input_file = sys.argv[1]
-        print(input_file)
         output_file = sys.argv[2]
-        file_name = output_file.split(".")[0]
+        
+        parser = CLDParser(input_file)
+        df = parser.read_cld_file()
 
-        df = parse_cld.read_cld_file(input_file)
-        dict_vars_name, dict_var = parse_cld.get_dict_to_vars(df)
+        dict_vars_final, dict_var_org = parser.get_dict_to_vars(df)
 
-        d = parse_cld.get_cld(df)
+        cld_dict = parser.get_cld_dict(df)
 
-        # combine the variable names dict and cld data
-        cld_data = [dict_vars_name, d]
+        # Combine the variable names dict and CLD data
+        cld_data = [dict_vars_final, cld_dict]
+
 
         with open(output_file, 'wb') as f:
             pickle.dump(cld_data, f)
 
-        G = nx.MultiDiGraph(d)
+        # G = nx.MultiDiGraph(d)
 
-        cld_nx.draw_labeled_multigraph(G, "weight", dict_vars_name)
-        # plt.show()
-        plt.savefig(file_name + ".png")
+        # cld_nx.draw_labeled_multigraph(G, "weight", dict_vars_name)
+        # # plt.show()
+        # plt.savefig(file_name + ".png")
 
     except Exception as e:
 

@@ -1,6 +1,7 @@
 import networkx as nx
 import itertools as it
 import matplotlib.pyplot as plt
+import parse_cld
 
 def draw_labeled_multigraph(G, attr_name, mapping, ax=None):
 
@@ -52,6 +53,28 @@ def get_nx_graph(d, theme_dict, cld_name: str, unique_theme_names):
 
     return g
 
+def get_dict_of_cld(data_dict, df_aggregate_names, dict_file_rename):
+
+    dict_cld = {}
+
+    for k, v in data_dict.items():
+        merge_df,  theme_dict = parse_cld.get_theme_cld(v, df_aggregate_names)
+
+        unique_theme_names = set(df_aggregate_names['theme'])
+
+    
+        df_subset = merge_df[['from', 'to', 'polarity_type']]
+        df_subset = df_subset.rename(columns={'polarity_type': 'weight'})
+
+        d = parse_cld.get_dict_of_dicts(df_subset)
+        # cld_name = k
+        cld_name = dict_file_rename.get(k)
+
+        g = get_nx_graph(d, theme_dict, cld_name, unique_theme_names)
+        dict_cld[cld_name] = g
+
+        return dict_cld
+
 def gravis_settings(g): 
 
     # initialise colour helper 
@@ -77,7 +100,7 @@ def gravis_settings(g):
     # edge features
     # blue is positive, green is negative, black is no sign 
 
-    colors = {1: 'blue', -1: 'green', 3: 'black'} 
+    colors = {1: 'blue', -1: 'green', 3: 'black', 0: 'red'} 
 
 
     for u, v, data in g.edges(data=True):
@@ -101,7 +124,6 @@ def gravis_settings(g):
 
 
 def cld_nx_properties(G): 
-
     
     print("Graph data:")
     print("-------------")
@@ -109,7 +131,6 @@ def cld_nx_properties(G):
     print('Directed:', G.is_directed())
     print('Number of nodes:', G.number_of_nodes())
     print('Number of edges:', G.number_of_edges())
-    print('Attributes:', G.graph)
 
 def cld_nx_node_properties(G):
     """
@@ -263,16 +284,14 @@ def clean_combined_graph(combined_graph, num_aggregate_nodes = 1, num_aggregate_
 
     # Add nodes to the new graph
     for node, attrs in combined_graph.nodes(data=True):
-        # print(attrs['cld'])
-        # print(len(attrs['cld']))
 
         if len(attrs['cld']) > num_aggregate_nodes: 
             attrs['single_level'] = attrs.pop('level')
-            if len(attrs['single_level']) >1: 
+            
+      
 
-                attrs['level'] = attrs['single_level'][0]
-            else: 
-                attrs['level'] = attrs['single_level']
+            attrs['level'] = list(set(attrs['single_level']))[0]
+
             attrs['nums_cld'] = len(attrs['cld'])
             new_graph.add_node(node, **attrs)
 
@@ -281,7 +300,6 @@ def clean_combined_graph(combined_graph, num_aggregate_nodes = 1, num_aggregate_
     # Add edges to the new graph with sum_weighted as the weight
     for u, v, attrs in combined_graph.edges(data=True):
         if u in new_graph and v in new_graph:
-            # print(u, ",", v, attrs)
             edge_attrs = attrs.copy()
             edge_attrs['single_weight'] = edge_attrs.pop('weight')
 
