@@ -215,7 +215,6 @@ def get_cld(df):
     d = get_dict_of_dicts(df_subset)
 
  
-    # d =  (df_subset)
     return d
 
 

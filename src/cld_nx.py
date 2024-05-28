@@ -293,17 +293,17 @@ def mulitiple_weights(g):
 
     return edge_weight
 
-# def get_nx_graph(d, cld_name: str, theme_dict = None, unique_theme_names = None):
+def get_nx_graph(d, cld_name: str, theme_dict = None, unique_theme_names = None):
     
-#     g = nx.DiGraph(d)
-#     # relabel the nodes to string names 
-#     if theme_dict is not None:
-#         g = nx.relabel_nodes(g, theme_dict)
-#     if unique_theme_names is not None: 
-#         g = set_node_attributes(g, cld_name =cld_name, unique_theme_names = unique_theme_names)
-#     g = set_edge_attributes(g, cld_name =cld_name)
+    g = nx.DiGraph(d)
+    # relabel the nodes to string names 
+    if theme_dict is not None:
+        g = nx.relabel_nodes(g, theme_dict)
+    if unique_theme_names is not None: 
+        g = set_node_attributes(g, cld_name =cld_name, unique_theme_names = unique_theme_names)
+    g = set_edge_attributes(g, cld_name =cld_name)
 
-#     return g
+    return g
 
 # def get_dict_of_cld(data_dict, df_aggregate_names, dict_file_rename):
 
