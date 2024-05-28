@@ -1,6 +1,8 @@
 import re
 import pandas as pd
 import numpy as np
+import networkx as nx
+import cld_aggregator 
 
 class CLDParser:
     def __init__(self, cld_path):
@@ -21,7 +23,8 @@ class CLDParser:
         extracted = []
         extract = False
 
-        for line in lines:
+        for line in lines: 
+            
             if start_pattern.match(line):
                 extract = True
                 extracted = []
@@ -31,6 +34,9 @@ class CLDParser:
                 if end_pattern.match(line):
                     extract = False
                     break
+                 # Check if the first character in the line is a number
+                if line.strip() and not line.strip()[0].isdigit():
+                    continue
                 extracted.append(line)
 
         if end_pattern == view2_pattern:
@@ -219,3 +225,28 @@ class CLDParser:
 
         df_aggregate_merge['vensim_var_no'] = df_aggregate_merge['vensim_var_no'].astype(int)
         list_of_duplicate_themes = self.get_duplicate_theme_no
+    
+
+ # TODO: fix this 
+ 
+    def get_dict_of_cld(data_dict, df_aggregate_names, dict_file_rename):
+
+        dict_cld = {}
+
+        for k, v in data_dict.items():
+            merge_df,  theme_dict = parse_cld.get_theme_cld(v, df_aggregate_names)
+
+            unique_theme_names = set(df_aggregate_names['theme'])
+
+        
+            df_subset = merge_df[['from', 'to', 'polarity_type']]
+            df_subset = df_subset.rename(columns={'polarity_type': 'weight'})
+
+            d = parse_cld.get_dict_of_dicts(df_subset)
+            # cld_name = k
+            cld_name = dict_file_rename.get(k)
+
+            g = get_nx_graph(d, theme_dict, cld_name, unique_theme_names)
+            dict_cld[cld_name] = g
+
+            return dict_cld

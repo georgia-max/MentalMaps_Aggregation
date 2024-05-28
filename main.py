@@ -10,7 +10,7 @@ import gravis
 import pandas as pd
 
 from src.vensim_parser import CLDParser
-from src import parse_cld, cld_nx
+# from src import parse_cld, cld_nx
 
 # sys.path.append(os.path.abspath(os.path.join('..', 'src')))
 # from src import parse_cld, cld_nx

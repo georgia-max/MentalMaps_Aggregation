@@ -43,37 +43,7 @@ def draw_labeled_multigraph(G, attr_name, mapping, ax=None):
     plt.tight_layout()
     # plt.show()
 
-def get_nx_graph(d, theme_dict, cld_name: str, unique_theme_names):
 
-    g = nx.DiGraph(d)
-    # relabel the nodes to string names 
-    g = nx.relabel_nodes(g, theme_dict)
-    g = set_node_attributes(g, cld_name =cld_name, unique_theme_names = unique_theme_names)
-    g = set_edge_attributes(g, cld_name =cld_name)
-
-    return g
-
-def get_dict_of_cld(data_dict, df_aggregate_names, dict_file_rename):
-
-    dict_cld = {}
-
-    for k, v in data_dict.items():
-        merge_df,  theme_dict = parse_cld.get_theme_cld(v, df_aggregate_names)
-
-        unique_theme_names = set(df_aggregate_names['theme'])
-
-    
-        df_subset = merge_df[['from', 'to', 'polarity_type']]
-        df_subset = df_subset.rename(columns={'polarity_type': 'weight'})
-
-        d = parse_cld.get_dict_of_dicts(df_subset)
-        # cld_name = k
-        cld_name = dict_file_rename.get(k)
-
-        g = get_nx_graph(d, theme_dict, cld_name, unique_theme_names)
-        dict_cld[cld_name] = g
-
-        return dict_cld
 
 def gravis_settings(g): 
 
@@ -235,7 +205,7 @@ def combine_graphs_with_node_attributes(graphs):
     
 
 
-    # Calculate sum_weighted for each edge
+    # Calculate merged_weight for each edge
     for u, v, attrs in combined_graph.edges(data=True):
         if 'weight' in attrs:
             set_unique_weights = set(attrs['weight'])
@@ -271,14 +241,6 @@ def combine_graphs_with_node_attributes(graphs):
     return combined_graph
 
 
-# def calcuate_merged_polarity_sign(attrs): 
-#     # if the list contains only 3 or 1s 
-
-#     if set(attrs[weight]) = 1:
-#         combined_graph[u][v]['sum_weighted'] = set(attrs[weight])
-#     else
-
-
 def clean_combined_graph(combined_graph, num_aggregate_nodes = 1, num_aggregate_edges =1):
     new_graph = nx.DiGraph()
 
@@ -287,14 +249,9 @@ def clean_combined_graph(combined_graph, num_aggregate_nodes = 1, num_aggregate_
 
         if len(attrs['cld']) > num_aggregate_nodes: 
             attrs['single_level'] = attrs.pop('level')
-            
-      
-
             attrs['level'] = list(set(attrs['single_level']))[0]
-
             attrs['nums_cld'] = len(attrs['cld'])
             new_graph.add_node(node, **attrs)
-
 
 
     # Add edges to the new graph with sum_weighted as the weight
@@ -311,3 +268,61 @@ def clean_combined_graph(combined_graph, num_aggregate_nodes = 1, num_aggregate_
     new_graph.remove_edges_from(nx.selfloop_edges(new_graph))
 
     return new_graph
+
+def mulitiple_weights(g):
+    """
+    This function multiple the weights of a cycle of a graph. The weights in the graph 
+    represents the polarity signe between variables. +1 postive, -1 negative, 3 neutral. 
+    In this function, I ignored all the neutral weights, and assume they are postive. 
+
+    # TODO: find a way to address the neutral weights later on. 
+
+    params: 
+    g: a subgraph of a graph that contains a cycle
+    """
+    edge_weight = 1
+
+    # get reinforcing or balancing loop 
+
+    for u, v, attrs in g.edges(data=True):
+        # multiple all weights together 
+        if attrs['weight'] == 1 or attrs['weight'] == -1: 
+            edge_weight *= attrs['weight']
+        else: 
+            pass 
+
+    return edge_weight
+
+# def get_nx_graph(d, cld_name: str, theme_dict = None, unique_theme_names = None):
+    
+#     g = nx.DiGraph(d)
+#     # relabel the nodes to string names 
+#     if theme_dict is not None:
+#         g = nx.relabel_nodes(g, theme_dict)
+#     if unique_theme_names is not None: 
+#         g = set_node_attributes(g, cld_name =cld_name, unique_theme_names = unique_theme_names)
+#     g = set_edge_attributes(g, cld_name =cld_name)
+
+#     return g
+
+# def get_dict_of_cld(data_dict, df_aggregate_names, dict_file_rename):
+
+#     dict_cld = {}
+
+#     for k, v in data_dict.items():
+#         merge_df,  theme_dict = parse_cld.get_theme_cld(v, df_aggregate_names)
+
+#         unique_theme_names = set(df_aggregate_names['theme'])
+
+    
+#         df_subset = merge_df[['from', 'to', 'polarity_type']]
+#         df_subset = df_subset.rename(columns={'polarity_type': 'weight'})
+
+#         d = parse_cld.get_dict_of_dicts(df_subset)
+#         # cld_name = k
+#         cld_name = dict_file_rename.get(k)
+
+#         g = get_nx_graph(d, theme_dict, cld_name, unique_theme_names)
+#         dict_cld[cld_name] = g
+
+#         return dict_cld
