@@ -24,6 +24,7 @@ def main():
 
 
     try:
+
         # Check if the file exists
         if not os.path.isfile(sys.argv[1]):
             print(sys.argv[1], "does not exist or is not a file.")
@@ -31,15 +32,18 @@ def main():
             raise FileNotFoundError(f"File not found: {sys.argv[1]}")
 
 
-         # Open the file and read its contents
+        #  Open the file and read its contents
         input_file = sys.argv[1]
         output_file = sys.argv[2]
+
+        # input_file = "toy_example/rabbit_example.mdl"
 
         df = read_cld_file(input_file)
         
         cld = CLDParser(df)
 
         cld_data = cld.get_cld_dict()
+        print(cld_data)
 
         # with open(output_file, 'wb') as f:
         #     pickle.dump(cld_data, f)

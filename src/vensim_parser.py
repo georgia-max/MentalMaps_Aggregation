@@ -2,7 +2,7 @@ import re
 import pandas as pd
 import numpy as np
 import networkx as nx
-from src.cld_aggregator import CLDGraph
+from cld_aggregator import CLDGraph
 
 class CLDParser:
     def __init__(self, df):
