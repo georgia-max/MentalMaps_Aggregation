@@ -54,7 +54,11 @@ def gravis_settings(g):
     node_color = {'org': 'blue', 'theme': 'green'}
 
     for node, data in g.nodes(data=True):
-        data['color'] = node_color[data['level']]
+        if isinstance(data['level'], list):
+            data['color'] = node_color[data['level'][0]]
+        else: 
+
+            data['color'] = node_color[data['level']]
         data['click'] = (
             "\nNode Features:" +
             f"\nCLD: {data['cld']}" + 
@@ -75,6 +79,8 @@ def gravis_settings(g):
 
     for u, v, data in g.edges(data=True):
         if 'weight' in data:
+            
+                
             if data['weight'] in colors:
                 data['color'] = colors[data['weight']]
             else:
@@ -136,7 +142,7 @@ def cld_nx_edge_properties(G):
         print('Target:', target)
         print('Attributes:', attributes)
 
-def set_node_attributes(g, cld_name: str, unique_theme_names = None):
+def set_node_theme_attributes(g, unique_theme_names = None):
     """
     Sets the node attributes of a NetworkX graph `G`.
 
@@ -148,10 +154,8 @@ def set_node_attributes(g, cld_name: str, unique_theme_names = None):
     Args:
         G (networkx.Graph): The NetworkX graph to set the node attributes for.
         unique_theme_names (list): A list of theme names.
-        cld_name (str): The name of the CLD.
-
+ 
     """
-    nx.set_node_attributes(g, name='cld', values= cld_name)
     if unique_theme_names is not None: 
         attrs = {node: {'level': 'theme'} if node in unique_theme_names else {'level': 'org'} for node in g.nodes()}
         nx.set_node_attributes(g, attrs)
@@ -162,6 +166,7 @@ def set_node_attributes(g, cld_name: str, unique_theme_names = None):
     return g 
 
 def set_edge_attributes(g, cld_name: str):
+    #TODO: fix this 
     """
     Sets the edge attributes of a NetworkX graph `G`.
 
@@ -175,7 +180,6 @@ def set_edge_attributes(g, cld_name: str):
     attr = {edge: {'weight': int(weight)} for edge, weight in nx.get_edge_attributes(g, 'weight').items()}
     nx.set_edge_attributes(g,attr)
 
-    nx.set_edge_attributes(g, name='cld', values= cld_name)
     return g
 
 
@@ -293,15 +297,15 @@ def mulitiple_weights(g):
 
     return edge_weight
 
-def get_nx_graph(d, cld_name: str, theme_dict = None, unique_theme_names = None):
+def get_nx_graph(g, cld_name: str, theme_dict = None, unique_theme_names = None):
     
-    g = nx.DiGraph(d)
+    # g = nx.DiGraph(d)
     # relabel the nodes to string names 
     if theme_dict is not None:
         g = nx.relabel_nodes(g, theme_dict)
-    if unique_theme_names is not None: 
-        g = set_node_attributes(g, cld_name =cld_name, unique_theme_names = unique_theme_names)
-    g = set_edge_attributes(g, cld_name =cld_name)
+    # if unique_theme_names is not None: 
+    #     g = set_node_attributes(g, cld_name =cld_name, unique_theme_names = unique_theme_names)
+    # g = set_edge_attributes(g, cld_name =cld_name)
 
     return g
 

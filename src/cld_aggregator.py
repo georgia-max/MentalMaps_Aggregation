@@ -1,13 +1,19 @@
 import networkx as nx
 import itertools as it
 import matplotlib.pyplot as plt
-# import parse_cld
+import cld_nx
+import gravis as gv
 
-class CLDGraph:
+class CLDGraph(nx.DiGraph):
     
     def __init__(self, graph=None):
-        self.graph = graph if graph is not None else nx.DiGraph()
-    
+        # self.graph = graph if graph is not None else nx.DiGraph()
+        super().__init__()
+
+        if graph is not None:
+            self.add_edges_from(graph.edges(data=True))
+            self.add_nodes_from(graph.nodes(data=True))
+
 
     def set_node_attributes(self, cld_name, unique_theme_names=None):
         """
@@ -18,12 +24,12 @@ class CLDGraph:
             unique_theme_names (set, optional): A set of node names that should be marked as 'theme' level nodes.
         """
 
-        nx.set_node_attributes(self.graph, name='cld', values=cld_name)
+        nx.set_node_attributes(self, name='cld', values=cld_name)
         if unique_theme_names is not None:
             attrs = {node: {'level': 'theme'} if node in unique_theme_names else {'level': 'org'} for node in self.graph.nodes()}
-            nx.set_node_attributes(self.graph, attrs)
-        node_degree_dict = {node: {'degree': int(degree)} for node, degree in self.graph.degree()}
-        nx.set_node_attributes(self.graph, node_degree_dict)
+            nx.set_node_attributes(self, attrs)
+        node_degree_dict = {node: {'degree': degree} for node, degree in self.degree()}
+        nx.set_node_attributes(self, node_degree_dict)
     
     def set_edge_attributes(self, cld_name):
         """
@@ -36,9 +42,9 @@ class CLDGraph:
             None
         """
 
-        attr = {edge: {'weight': int(weight)} for edge, weight in nx.get_edge_attributes(self.graph, 'weight').items()}
-        nx.set_edge_attributes(self.graph, attr)
-        nx.set_edge_attributes(self.graph, name='cld', values=cld_name)
+        attr = {edge: {'weight': int(weight)} for edge, weight in nx.get_edge_attributes(self, 'weight').items()}
+        nx.set_edge_attributes(self, attr)
+        nx.set_edge_attributes(self, name='cld', values=cld_name)
     
     def graph_properties(self):
         """
@@ -47,10 +53,10 @@ class CLDGraph:
 
         print("Graph data:")
         print("-------------")
-        print('Type:', type(self.graph))
-        print('Directed:', self.graph.is_directed())
-        print('Number of nodes:', self.graph.number_of_nodes())
-        print('Number of edges:', self.graph.number_of_edges())
+        print('Type:', type(self))
+        print('Directed:', self.is_directed())
+        print('Number of nodes:', self.number_of_nodes())
+        print('Number of edges:', self.number_of_edges())
     
     def node_properties(self):
         """
@@ -59,11 +65,13 @@ class CLDGraph:
 
         print("Node data:")
         print("-------------")
-        for node, attributes in list(self.graph.nodes.data())[:20]:
+        for node, attributes in list(self.nodes.data())[:20]:
             print('Type:', type(node), type(attributes))
             print('Var Name:', node)
             print('Attributes:', attributes)
-            print('Degree:', self.graph.degree(node))
+            print('Degree:', self.degree(node))
+            print()
+
     
     def edge_properties(self):
         """
@@ -72,13 +80,13 @@ class CLDGraph:
         
         print("Edge data:")
         print("-------------")
-        for source, target, attributes in list(self.graph.edges.data())[:20]:
+        for source, target, attributes in list(self.edges.data())[:20]:
             print('Type:', type(source), type(target), type(attributes))
             print('Source:', source)
             print('Target:', target)
             print('Attributes:', attributes)
     
-    def combine_graphs_with_node_attributes(graphs):
+    def combine_graphs_with_node_attributes(self):
         """
         Combines multiple graphs into a single graph, merging node attributes and edge attributes.
         
@@ -90,7 +98,7 @@ class CLDGraph:
         """
 
         combined_graph = nx.DiGraph()
-        for g in graphs:
+        for g in self:
             for node, attrs in g.nodes(data=True):
                 if node not in combined_graph:
                     combined_graph.add_node(node, **{k: [v] for k, v in attrs.items()})
@@ -128,22 +136,22 @@ class CLDGraph:
         return combined_graph
     
 
-    def draw_labeled_multigraph(self, attr_name, mapping, ax=None):
-        """
-        Draw a labeled networkx multigraph with the specified attributes.
+    # def draw_labeled_multigraph(self, attr_name, mapping, ax=None):
+    #     """
+    #     Draw a labeled networkx multigraph with the specified attributes.
 
-        """
+    #     """
 
-        plt.figure(figsize=(15, 10))
-        connectionstyle = [f"arc3,rad={r}" for r in it.accumulate([0.15] * 4)]
-        self.graph = nx.relabel_nodes(self.graph, mapping, copy=False)
-        pos = nx.circular_layout(self.graph, scale=0.2)
-        nx.draw_networkx_nodes(self.graph, pos, ax=ax, node_color="tab:blue", node_size=100)
-        nx.draw_networkx_labels(self.graph, pos, font_size=20, ax=ax)
-        nx.draw_networkx_edges(self.graph, pos, edge_color="red", connectionstyle=connectionstyle, ax=ax)
-        labels = {tuple(edge): f"{attr_name}={attrs[attr_name]}" for *edge, attrs in self.graph.edges(keys=True, data=True)}
-        nx.draw_networkx_edge_labels(self.graph, pos, labels, connectionstyle=connectionstyle, label_pos=0.3, font_color="red", font_size=20, bbox={"alpha": 0}, ax=ax)
-        plt.tight_layout()
+    #     plt.figure(figsize=(15, 10))
+    #     connectionstyle = [f"arc3,rad={r}" for r in it.accumulate([0.15] * 4)]
+    #     self.graph = nx.relabel_nodes(self.graph, mapping, copy=False)
+    #     pos = nx.circular_layout(self.graph, scale=0.2)
+    #     nx.draw_networkx_nodes(self.graph, pos, ax=ax, node_color="tab:blue", node_size=100)
+    #     nx.draw_networkx_labels(self.graph, pos, font_size=20, ax=ax)
+    #     nx.draw_networkx_edges(self.graph, pos, edge_color="red", connectionstyle=connectionstyle, ax=ax)
+    #     labels = {tuple(edge): f"{attr_name}={attrs[attr_name]}" for *edge, attrs in self.graph.edges(keys=True, data=True)}
+    #     nx.draw_networkx_edge_labels(self.graph, pos, labels, connectionstyle=connectionstyle, label_pos=0.3, font_color="red", font_size=20, bbox={"alpha": 0}, ax=ax)
+    #     plt.tight_layout()
         
 
     def gravis_settings(self): 
@@ -169,12 +177,12 @@ class CLDGraph:
         
 
         # initialise colour helper 
-        vals = nx.get_edge_attributes(self.graph, 'weight').values()
+        vals = nx.get_edge_attributes(self, 'weight').values()
 
         # node feature
         node_color = {'org': 'blue', 'theme': 'green'}
 
-        for node, data in self.graph.nodes(data=True):
+        for node, data in self.nodes(data=True):
             data['color'] = node_color[data['level']]
             data['click'] = (
                 "\nNode Features:" +
@@ -192,7 +200,7 @@ class CLDGraph:
         colors = {1: 'blue', -1: 'green', 3: 'black', 0: 'red'} 
 
 
-        for u, v, data in self.graph.edges(data=True):
+        for u, v, data in self.edges(data=True):
             if 'weight' in data:
                 if data['weight'] in colors:
                     data['color'] = colors[data['weight']]
@@ -207,7 +215,7 @@ class CLDGraph:
                     f"\nPolarity Sign: {data['weight']}"
                 )
     
-    def clean_combined_graph(combined_graph, num_aggregate_nodes=1, num_aggregate_edges=1):
+    def clean_combined_graph(self, combined_graph, num_aggregate_nodes=1, num_aggregate_edges=1):
         """
         Cleans the combined graph by aggregating nodes and edges based on the provided thresholds.
         
@@ -272,14 +280,32 @@ class CLDGraph:
 
 
 
-# # Example usage
-# if __name__ == "__main__":""
-#     # Initialize graph with data or add nodes/edges as needed
-#     graph = nx.DiGraph()
-#     cld_graph = CLDGraph(graph)
-    
-#     # Use the methods as needed
-#     cld_graph.graph_properties()
-#     cld_graph.node_properties()
-#     cld_graph.edge_properties()
-#     # Add more functionality as needed
+# Example usage
+if __name__ == "__main__":
+    # Example dictionary input
+    d = {
+        'A': {'B': {'weight': 1}},
+        'B': {'C': {'weight': -1}},
+        'C': {'A': {'weight': 1}}
+    }
+    theme_dict = {'A': 'Alpha', 'B': 'Bravo', 'C': 'Charlie'}
+    unique_theme_names = {'Alpha', 'Bravo'}
+
+    cld_name = "Example CLD"
+    g = cld_nx.get_nx_graph(d, cld_name, theme_dict, unique_theme_names)
+    dict_cld = {cld_name: CLDGraph(g)}
+
+    # Debugging: Print nodes and edges before passing to gravis
+    print("Nodes in the graph:", list(dict_cld[cld_name].nodes(data=True)))
+    print("Edges in the graph:", list(dict_cld[cld_name].edges(data=True)))
+
+    # Ensure the graph does not have node key `0`
+    assert 0 not in dict_cld[cld_name].nodes(), "Node with key `0` found in the graph!"
+
+    # Visualization with gravis
+    try:
+        gv.d3(dict_cld[cld_name], graph_height=500)
+    except KeyError as e:
+        print(f"KeyError: {e}")
+        # Further debug information
+        print("Available nodes:", dict_cld[cld_name].nodes())
