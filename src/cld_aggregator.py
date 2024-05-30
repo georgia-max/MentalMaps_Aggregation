@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import cld_nx
 import gravis as gv
 
+# TODO: shouldn't use the CLDGraph object because gravis cannot handle it. 
+
 class CLDGraph(nx.DiGraph):
     
     def __init__(self, graph=None):
