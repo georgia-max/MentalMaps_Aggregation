@@ -125,7 +125,7 @@ def cld_nx_node_properties(G):
     print("Node data:")
     print("-------------")
     print()
-    for node, attributes in list(G.nodes.data())[:20]: 
+    for node, attributes in list(G.nodes.data())[:5]: 
         print('Type:', type(node), type(attributes))
         print('Var Name:', node)
         print('Attributes:', attributes)
@@ -136,11 +136,14 @@ def cld_nx_edge_properties(G):
     print("Edge data:")
     print("-------------")
 
-    for source, target, attributes in list(G.edges.data())[:20]:
+    for source, target, attributes in list(G.edges.data())[:5]:
         print('Type:', type(source), type(target), type(attributes))
         print('Source:', source)
         print('Target:', target)
         print('Attributes:', attributes)
+        for k, v in attributes.items():
+            print(f'\t{k}: {v}')
+            print('Type', type(v))
 
 def set_node_theme_attributes(g, unique_theme_names = None):
     """
@@ -246,10 +249,12 @@ def combine_graphs_with_node_attributes(graphs):
 
 
 def clean_combined_graph(combined_graph, num_aggregate_nodes = 1, num_aggregate_edges =1):
+    
     new_graph = nx.DiGraph()
 
     # Add nodes to the new graph
     for node, attrs in combined_graph.nodes(data=True):
+
 
         if len(attrs['cld']) > num_aggregate_nodes: 
             attrs['single_level'] = attrs.pop('level')
@@ -264,7 +269,8 @@ def clean_combined_graph(combined_graph, num_aggregate_nodes = 1, num_aggregate_
             edge_attrs = attrs.copy()
             edge_attrs['single_weight'] = edge_attrs.pop('weight')
 
-            edge_attrs['weight'] = edge_attrs.pop('merge_weight')
+            edge_attrs['weight'] = int(edge_attrs.pop('merge_weight'))
+            edge_attrs.pop('single_weight')
 
             if edge_attrs['weight'] > num_aggregate_edges: 
                 new_graph.add_edge(u, v, **edge_attrs)
