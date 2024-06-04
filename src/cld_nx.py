@@ -2,6 +2,8 @@ import networkx as nx
 import itertools as it
 import matplotlib.pyplot as plt
 import parse_cld
+from functools import reduce
+
 
 def draw_labeled_multigraph(G, attr_name, mapping, ax=None):
 
@@ -314,6 +316,7 @@ def get_nx_graph(g, cld_name: str, theme_dict = None, unique_theme_names = None)
     # g = set_edge_attributes(g, cld_name =cld_name)
 
     return g
+
 
 # def get_dict_of_cld(data_dict, df_aggregate_names, dict_file_rename):
 

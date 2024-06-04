@@ -21,3 +21,4 @@ gravis_example/
 *.pickle
 
 *.html
+*txt
