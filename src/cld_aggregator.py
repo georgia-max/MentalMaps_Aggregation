@@ -7,6 +7,7 @@ import gravis as gv
 # TODO: shouldn't use the CLDGraph object because gravis cannot handle it. 
 
 class CLDGraph(nx.DiGraph):
+class CLDGraph(nx.DiGraph):
     
     def __init__(self, graph=None):
         # self.graph = graph if graph is not None else nx.DiGraph()
@@ -27,8 +28,12 @@ class CLDGraph(nx.DiGraph):
         """
 
         nx.set_node_attributes(self, name='cld', values=cld_name)
+        nx.set_node_attributes(self, name='cld', values=cld_name)
         if unique_theme_names is not None:
             attrs = {node: {'level': 'theme'} if node in unique_theme_names else {'level': 'org'} for node in self.graph.nodes()}
+            nx.set_node_attributes(self, attrs)
+        node_degree_dict = {node: {'degree': degree} for node, degree in self.degree()}
+        nx.set_node_attributes(self, node_degree_dict)
             nx.set_node_attributes(self, attrs)
         node_degree_dict = {node: {'degree': degree} for node, degree in self.degree()}
         nx.set_node_attributes(self, node_degree_dict)
@@ -47,6 +52,9 @@ class CLDGraph(nx.DiGraph):
         attr = {edge: {'weight': int(weight)} for edge, weight in nx.get_edge_attributes(self, 'weight').items()}
         nx.set_edge_attributes(self, attr)
         nx.set_edge_attributes(self, name='cld', values=cld_name)
+        attr = {edge: {'weight': int(weight)} for edge, weight in nx.get_edge_attributes(self, 'weight').items()}
+        nx.set_edge_attributes(self, attr)
+        nx.set_edge_attributes(self, name='cld', values=cld_name)
     
     def graph_properties(self):
         """
@@ -55,6 +63,10 @@ class CLDGraph(nx.DiGraph):
 
         print("Graph data:")
         print("-------------")
+        print('Type:', type(self))
+        print('Directed:', self.is_directed())
+        print('Number of nodes:', self.number_of_nodes())
+        print('Number of edges:', self.number_of_edges())
         print('Type:', type(self))
         print('Directed:', self.is_directed())
         print('Number of nodes:', self.number_of_nodes())
@@ -68,9 +80,13 @@ class CLDGraph(nx.DiGraph):
         print("Node data:")
         print("-------------")
         for node, attributes in list(self.nodes.data())[:20]:
+        for node, attributes in list(self.nodes.data())[:20]:
             print('Type:', type(node), type(attributes))
             print('Var Name:', node)
             print('Attributes:', attributes)
+            print('Degree:', self.degree(node))
+            print()
+
             print('Degree:', self.degree(node))
             print()
 
@@ -89,6 +105,7 @@ class CLDGraph(nx.DiGraph):
             print('Attributes:', attributes)
     
     def combine_graphs_with_node_attributes(self):
+    def combine_graphs_with_node_attributes(self):
         """
         Combines multiple graphs into a single graph, merging node attributes and edge attributes.
         
@@ -100,6 +117,7 @@ class CLDGraph(nx.DiGraph):
         """
 
         combined_graph = nx.DiGraph()
+        for g in self:
         for g in self:
             for node, attrs in g.nodes(data=True):
                 if node not in combined_graph:
@@ -141,9 +159,23 @@ class CLDGraph(nx.DiGraph):
     # def draw_labeled_multigraph(self, attr_name, mapping, ax=None):
     #     """
     #     Draw a labeled networkx multigraph with the specified attributes.
+    # def draw_labeled_multigraph(self, attr_name, mapping, ax=None):
+    #     """
+    #     Draw a labeled networkx multigraph with the specified attributes.
 
     #     """
+    #     """
 
+    #     plt.figure(figsize=(15, 10))
+    #     connectionstyle = [f"arc3,rad={r}" for r in it.accumulate([0.15] * 4)]
+    #     self.graph = nx.relabel_nodes(self.graph, mapping, copy=False)
+    #     pos = nx.circular_layout(self.graph, scale=0.2)
+    #     nx.draw_networkx_nodes(self.graph, pos, ax=ax, node_color="tab:blue", node_size=100)
+    #     nx.draw_networkx_labels(self.graph, pos, font_size=20, ax=ax)
+    #     nx.draw_networkx_edges(self.graph, pos, edge_color="red", connectionstyle=connectionstyle, ax=ax)
+    #     labels = {tuple(edge): f"{attr_name}={attrs[attr_name]}" for *edge, attrs in self.graph.edges(keys=True, data=True)}
+    #     nx.draw_networkx_edge_labels(self.graph, pos, labels, connectionstyle=connectionstyle, label_pos=0.3, font_color="red", font_size=20, bbox={"alpha": 0}, ax=ax)
+    #     plt.tight_layout()
     #     plt.figure(figsize=(15, 10))
     #     connectionstyle = [f"arc3,rad={r}" for r in it.accumulate([0.15] * 4)]
     #     self.graph = nx.relabel_nodes(self.graph, mapping, copy=False)
