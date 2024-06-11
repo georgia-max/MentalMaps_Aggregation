@@ -22,7 +22,6 @@ import traceback
 
 def main():
 
-
     try:
 
         # Check if the file exists

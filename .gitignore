@@ -15,9 +15,15 @@ gravis_example/
 .venv/
 .venv
 .idea/
+venv/
 
+notebook/test-trainer
+
+notebook/my_model
+test-trainer/
 
 
 *.pickle
 
 *.html
+*txt

@@ -1,7 +1,9 @@
 import networkx as nx
 import itertools as it
 import matplotlib.pyplot as plt
-import parse_cld
+# import parse_cld
+from functools import reduce
+
 
 def draw_labeled_multigraph(G, attr_name, mapping, ax=None):
 
@@ -59,6 +61,11 @@ def gravis_settings(g):
         else: 
 
             data['color'] = node_color[data['level']]
+        if isinstance(data['level'], list):
+            data['color'] = node_color[data['level'][0]]
+        else: 
+
+            data['color'] = node_color[data['level']]
         data['click'] = (
             "\nNode Features:" +
             f"\nCLD: {data['cld']}" + 
@@ -79,6 +86,8 @@ def gravis_settings(g):
 
     for u, v, data in g.edges(data=True):
         if 'weight' in data:
+            
+                
             
                 
             if data['weight'] in colors:
@@ -125,7 +134,7 @@ def cld_nx_node_properties(G):
     print("Node data:")
     print("-------------")
     print()
-    for node, attributes in list(G.nodes.data())[:20]: 
+    for node, attributes in list(G.nodes.data())[:5]: 
         print('Type:', type(node), type(attributes))
         print('Var Name:', node)
         print('Attributes:', attributes)
@@ -136,12 +145,20 @@ def cld_nx_edge_properties(G):
     print("Edge data:")
     print("-------------")
 
-    for source, target, attributes in list(G.edges.data())[:20]:
+    for source, target, attributes in list(G.edges.data())[:5]:
+    for source, target, attributes in list(G.edges.data())[:5]:
         print('Type:', type(source), type(target), type(attributes))
         print('Source:', source)
         print('Target:', target)
         print('Attributes:', attributes)
+        for k, v in attributes.items():
+            print(f'\t{k}: {v}')
+            print('Type', type(v))
+        for k, v in attributes.items():
+            print(f'\t{k}: {v}')
+            print('Type', type(v))
 
+def set_node_theme_attributes(g, unique_theme_names = None):
 def set_node_theme_attributes(g, unique_theme_names = None):
     """
     Sets the node attributes of a NetworkX graph `G`.
@@ -155,6 +172,7 @@ def set_node_theme_attributes(g, unique_theme_names = None):
         G (networkx.Graph): The NetworkX graph to set the node attributes for.
         unique_theme_names (list): A list of theme names.
  
+ 
     """
     if unique_theme_names is not None: 
         attrs = {node: {'level': 'theme'} if node in unique_theme_names else {'level': 'org'} for node in g.nodes()}
@@ -166,6 +184,7 @@ def set_node_theme_attributes(g, unique_theme_names = None):
     return g 
 
 def set_edge_attributes(g, cld_name: str):
+    #TODO: fix this 
     #TODO: fix this 
     """
     Sets the edge attributes of a NetworkX graph `G`.
@@ -246,10 +265,14 @@ def combine_graphs_with_node_attributes(graphs):
 
 
 def clean_combined_graph(combined_graph, num_aggregate_nodes = 1, num_aggregate_edges =1):
+    
+    
     new_graph = nx.DiGraph()
 
     # Add nodes to the new graph
     for node, attrs in combined_graph.nodes(data=True):
+
+
 
         if len(attrs['cld']) > num_aggregate_nodes: 
             attrs['single_level'] = attrs.pop('level')
@@ -264,7 +287,10 @@ def clean_combined_graph(combined_graph, num_aggregate_nodes = 1, num_aggregate_
             edge_attrs = attrs.copy()
             edge_attrs['single_weight'] = edge_attrs.pop('weight')
 
-            edge_attrs['weight'] = edge_attrs.pop('merge_weight')
+            edge_attrs['weight'] = int(edge_attrs.pop('merge_weight'))
+            edge_attrs.pop('single_weight')
+            edge_attrs['weight'] = int(edge_attrs.pop('merge_weight'))
+            edge_attrs.pop('single_weight')
 
             if edge_attrs['weight'] > num_aggregate_edges: 
                 new_graph.add_edge(u, v, **edge_attrs)
@@ -298,7 +324,15 @@ def mulitiple_weights(g):
     return edge_weight
 
 def get_nx_graph(g, cld_name: str, theme_dict = None, unique_theme_names = None):
+def get_nx_graph(g, cld_name: str, theme_dict = None, unique_theme_names = None):
     
+    # g = nx.DiGraph(d)
+    # relabel the nodes to string names 
+    if theme_dict is not None:
+        g = nx.relabel_nodes(g, theme_dict)
+    # if unique_theme_names is not None: 
+    #     g = set_node_attributes(g, cld_name =cld_name, unique_theme_names = unique_theme_names)
+    # g = set_edge_attributes(g, cld_name =cld_name)
     # g = nx.DiGraph(d)
     # relabel the nodes to string names 
     if theme_dict is not None:
@@ -308,6 +342,9 @@ def get_nx_graph(g, cld_name: str, theme_dict = None, unique_theme_names = None)
     # g = set_edge_attributes(g, cld_name =cld_name)
 
     return g
+
+    return g
+
 
 # def get_dict_of_cld(data_dict, df_aggregate_names, dict_file_rename):
 
