@@ -38,7 +38,7 @@ This notebook is designed to translate MDL files to Python. The goal is to creat
 
 Run the script in the terminal to translate a folder of Vensim MDL files and store them into .json files. 
 ```
-./test_script.sh
+./json_script.sh
 ```
 
 Check out the Toy Example here: https://github.com/georgia-max/Phrame-MentalMaps/blob/master/Toy_Model.ipynb 

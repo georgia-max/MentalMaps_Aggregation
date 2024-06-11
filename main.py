@@ -12,6 +12,8 @@ import pandas as pd
 from src.vensim_parser import CLDParser
 # from src import parse_cld, cld_nx
 
+from src.data_io import read_json, read_cld_file
+
 # sys.path.append(os.path.abspath(os.path.join('..', 'src')))
 # from src import parse_cld, cld_nx
 # from src.parse_cld import read_cld_file, get_cld_df, get_dict_to_vars, get_adjacency_matrix, get_polarity_matrix, get_cld
@@ -20,8 +22,8 @@ import traceback
 
 def main():
 
-
     try:
+
         # Check if the file exists
         if not os.path.isfile(sys.argv[1]):
             print(sys.argv[1], "does not exist or is not a file.")
@@ -29,23 +31,21 @@ def main():
             raise FileNotFoundError(f"File not found: {sys.argv[1]}")
 
 
-         # Open the file and read its contents
+        #  Open the file and read its contents
         input_file = sys.argv[1]
         output_file = sys.argv[2]
+
+        # input_file = "toy_example/rabbit_example.mdl"
+
+        df = read_cld_file(input_file)
         
-        parser = CLDParser(input_file)
-        df = parser.read_cld_file()
+        cld = CLDParser(df)
 
-        dict_vars_final, dict_var_org = parser.get_dict_to_vars(df)
+        cld_data = cld.get_cld_dict()
+        print(cld_data)
 
-        cld_dict = parser.get_cld_dict(df)
-
-        # Combine the variable names dict and CLD data
-        cld_data = [dict_vars_final, cld_dict]
-
-
-        with open(output_file, 'wb') as f:
-            pickle.dump(cld_data, f)
+        # with open(output_file, 'wb') as f:
+        #     pickle.dump(cld_data, f)
 
         # G = nx.MultiDiGraph(d)
 

@@ -3,17 +3,11 @@ import pandas as pd
 import pickle
 
 from src import parse_cld
-# import src.parse_cld
-
-# from src.parse_cld import read_cld_file, get_cld_df, get_dict_to_vars
-# from src.parse_cld import get_adjacency_matrix, get_polarity_matrix
-# from src.parse_cld import get_dataframe, get_combine_matrix
-
 
 class TestParseCLD(unittest.TestCase):
 
     def setUp(self):
-        self.cld_data = parse_cld.read_cld_file('Testing/rabbit_example.mdl')
+        self.cld_data = parse_cld.read_cld_file('toy_example/rabbit_example.mdl')
         # self.cld_data = read_cld_file('Dataset/SYNCH/Pine_Ridge/ME_10_5_2021_X2.mdl')
 
     def test_read_cld_file(self):

@@ -22,6 +22,7 @@ cycler==0.12.1
 debugpy==1.8.1
 decorator==5.1.1
 defusedxml==0.7.1
+et-xmlfile==1.1.0
 executing==2.0.1
 fastjsonschema==2.19.1
 filelock==3.14.0
@@ -84,6 +85,7 @@ nltk==3.8.1
 notebook-as-pdf==0.5.0
 notebook_shim==0.2.4
 numpy==1.26.4
+openpyxl==3.1.2
 opt-einsum==3.3.0
 optree==0.11.0
 overrides==7.7.0
@@ -108,6 +110,7 @@ Pygments==2.17.2
 pyparsing==3.1.2
 PyPDF2==3.0.1
 pyppeteer==2.0.0
+pyspellchecker==0.8.1
 pytest==8.2.0
 python-dateutil==2.9.0.post0
 python-json-logger==2.0.7
@@ -126,7 +129,7 @@ scikit-learn==1.4.2
 scipy==1.13.0
 seaborn==0.13.2
 Send2Trash==1.8.3
-sentence-transformers==2.7.0
+sentence-transformers==3.0.0
 setuptools==69.5.1
 six==1.16.0
 sklearn-features==0.0.2

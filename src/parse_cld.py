@@ -215,7 +215,6 @@ def get_cld(df):
     d = get_dict_of_dicts(df_subset)
 
  
-    # d =  (df_subset)
     return d
 
 
@@ -275,6 +274,7 @@ def get_duplicate_theme_no(df):
 # functions for aggregateCLD.ipynb 
 
 def get_theme_cld(cld_dict, df_theme ): 
+    # TODO: such as bad way to do it... 
     """
     Get the single theme CLD from the input DataFrame.
     
