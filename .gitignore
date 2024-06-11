@@ -15,7 +15,9 @@ gravis_example/
 .venv/
 .venv
 .idea/
+venv/
 
+test-trainer/
 
 
 *.pickle
