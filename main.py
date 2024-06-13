@@ -35,17 +35,14 @@ def main():
         input_file = sys.argv[1]
         output_file = sys.argv[2]
 
-        # input_file = "toy_example/rabbit_example.mdl"
-
         df = read_cld_file(input_file)
         
         cld = CLDParser(df)
 
         cld_data = cld.get_cld_dict()
-        print(cld_data)
 
-        # with open(output_file, 'wb') as f:
-        #     pickle.dump(cld_data, f)
+        with open(output_file, 'wb') as f:
+            pickle.dump(cld_data, f)
 
         # G = nx.MultiDiGraph(d)
 
