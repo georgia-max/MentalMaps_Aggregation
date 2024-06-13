@@ -7,7 +7,6 @@ import gravis as gv
 # TODO: shouldn't use the CLDGraph object because gravis cannot handle it. 
 
 class CLDGraph(nx.DiGraph):
-class CLDGraph(nx.DiGraph):
     
     def __init__(self, graph=None):
         # self.graph = graph if graph is not None else nx.DiGraph()
@@ -16,6 +15,7 @@ class CLDGraph(nx.DiGraph):
         if graph is not None:
             self.add_edges_from(graph.edges(data=True))
             self.add_nodes_from(graph.nodes(data=True))
+            
 
 
     def set_node_attributes(self, cld_name, unique_theme_names=None):
@@ -32,11 +32,13 @@ class CLDGraph(nx.DiGraph):
         if unique_theme_names is not None:
             attrs = {node: {'level': 'theme'} if node in unique_theme_names else {'level': 'org'} for node in self.graph.nodes()}
             nx.set_node_attributes(self, attrs)
-        node_degree_dict = {node: {'degree': degree} for node, degree in self.degree()}
+            
+        node_degree_dict = {node: {'degree': degree} for node, degree in self.graph.degree()}
         nx.set_node_attributes(self, node_degree_dict)
-            nx.set_node_attributes(self, attrs)
-        node_degree_dict = {node: {'degree': degree} for node, degree in self.degree()}
-        nx.set_node_attributes(self, node_degree_dict)
+        
+        #     nx.set_node_attributes(self, attrs)
+        # node_degree_dict = {node: {'degree': degree} for node, degree in self.degree()}
+        # nx.set_node_attributes(self, node_degree_dict)
     
     def set_edge_attributes(self, cld_name):
         """
@@ -80,14 +82,13 @@ class CLDGraph(nx.DiGraph):
         print("Node data:")
         print("-------------")
         for node, attributes in list(self.nodes.data())[:20]:
-        for node, attributes in list(self.nodes.data())[:20]:
             print('Type:', type(node), type(attributes))
             print('Var Name:', node)
             print('Attributes:', attributes)
-            print('Degree:', self.degree(node))
+            print('Degree:', self.graph.degree(node))
             print()
 
-            print('Degree:', self.degree(node))
+            print('Degree:', self.graph.degree(node))
             print()
 
     
@@ -105,7 +106,6 @@ class CLDGraph(nx.DiGraph):
             print('Attributes:', attributes)
     
     def combine_graphs_with_node_attributes(self):
-    def combine_graphs_with_node_attributes(self):
         """
         Combines multiple graphs into a single graph, merging node attributes and edge attributes.
         
@@ -117,7 +117,6 @@ class CLDGraph(nx.DiGraph):
         """
 
         combined_graph = nx.DiGraph()
-        for g in self:
         for g in self:
             for node, attrs in g.nodes(data=True):
                 if node not in combined_graph:

@@ -5,6 +5,7 @@ import networkx as nx
 from src.cld_aggregator import CLDGraph
 
 class CLDParser:
+
     def __init__(self, df):
         self.df = df
 
@@ -186,7 +187,7 @@ class CLDParser:
                 - theme_dict (dict): A dictionary mapping theme numbers to theme names.
 
         """
-        dict_vars, df = self.get_dataframe(cld_dict)
+        dict_vars, df = self.get_cld_dataframe(cld_dict)
 
         vars_cld = pd.DataFrame.from_dict(dict_vars, orient='index').reset_index()#.columns(['Vensim Var No.', 'Var Name'])
         # rename columns 
