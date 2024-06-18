@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Run  ./test_script.sh
+# Run  ./translate_vensim_script.sh
 
-# Define the directories 
+# Change the directories 
 
-INPUT_DIR="Dataset/SYNCH/RC"
-OUTPUT_DIR="Output/SYNCH/JSON_file/RC"
+INPUT_DIR="data/SYNCH/RC/clean"
+OUTPUT_DIR="results/SYNCH/JSON_file/RC/clean"
 
 # Create the output directory if it doesn't already exist
 mkdir -p "$OUTPUT_DIR"

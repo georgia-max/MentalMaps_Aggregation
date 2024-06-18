@@ -3,7 +3,7 @@ import itertools as it
 import matplotlib.pyplot as plt
 # import parse_cld
 from functools import reduce
-
+import numpy as np
 
 def draw_labeled_multigraph(G, attr_name, mapping, ax=None):
 
@@ -56,26 +56,24 @@ def gravis_settings(g):
     node_color = {'org': 'blue', 'theme': 'green'}
 
     for node, data in g.nodes(data=True):
-        if isinstance(data['level'], list):
-            data['color'] = node_color[data['level'][0]]
-        else: 
+        if 'level' in data:
 
-            data['color'] = node_color[data['level']]
-        if isinstance(data['level'], list):
-            data['color'] = node_color[data['level'][0]]
-        else: 
+            if isinstance(data['level'], list):
+                data['color'] = node_color[data['level'][0]]
+            else: 
 
-            data['color'] = node_color[data['level']]
-        data['click'] = (
-            "\nNode Features:" +
-            f"\nCLD: {data['cld']}" + 
-            f"\nLevel: {data['level']}"
-        )
-        data['title'] = (
-            "\nNode Features:" +
-            f"\nCLD: {data['cld']}" + 
-            f"\nLevel: {data['level']}" # + 
-        ) 
+                data['color'] = node_color[data['level']]
+            
+        # data['click'] = (
+        #     "\nNode Features:" +
+        #     f"\nCLD: {data['cld']}" + 
+        #     f"\nLevel: {data['level']}"
+        # )
+        # data['title'] = (
+        #     "\nNode Features:" +
+        #     f"\nCLD: {data['cld']}" + 
+        #     f"\nLevel: {data['level']}" # + 
+        # ) 
 
 
     # edge features
@@ -97,15 +95,32 @@ def gravis_settings(g):
         else:
             data['color'] = 'black'
         
-        data['click'] = (
-                f"\nEdge Features:" + 
-                f"\nCLD: {data['cld']}" + 
-                f"\nPolarity Sign: {data['weight']}"
-            )
+        # data['click'] = (
+        #         f"\nEdge Features:" + 
+        #         f"\nCLD: {data['cld']}" + 
+        #         f"\nPolarity Sign: {data['weight']}"
+        #     )
 
         
 
 
+def clean_graph_for_gravis(graph):
+    # Convert all node and edge attributes to JSON serializable types
+    for node, attrs in graph.nodes(data=True):
+        for key, value in attrs.items():
+            
+            if isinstance(value, np.integer):
+                attrs[key] = int(value)
+            elif isinstance(value,  np.floating):
+                attrs[key] = float(value)
+
+    for u, v, attrs in graph.edges(data=True):
+        for key, value in attrs.items():
+            if isinstance(value, np.integer):
+                attrs[key] = int(value)
+            elif isinstance(value,  np.floating):
+                attrs[key] = float(value)
+    return graph
 
 
 def cld_nx_properties(G): 
@@ -145,7 +160,7 @@ def cld_nx_edge_properties(G):
     print("Edge data:")
     print("-------------")
 
-    for source, target, attributes in list(G.edges.data())[:5]:
+    for source, target, attributes in list(G.edges.data()):
         print('Type:', type(source), type(target), type(attributes))
         print('Source:', source)
         print('Target:', target)
@@ -262,7 +277,7 @@ def combine_graphs_with_node_attributes(graphs):
     return combined_graph
 
 
-def clean_combined_graph(combined_graph, num_aggregate_nodes = 1, num_aggregate_edges =1):
+def clean_combined_graph(combined_graph, num_aggregate_nodes = 0, num_aggregate_edges =0):
     
     
     new_graph = nx.DiGraph()
@@ -292,7 +307,7 @@ def clean_combined_graph(combined_graph, num_aggregate_nodes = 1, num_aggregate_
             if edge_attrs['weight'] > num_aggregate_edges: 
                 new_graph.add_edge(u, v, **edge_attrs)
 
-    new_graph.remove_edges_from(nx.selfloop_edges(new_graph))
+    # new_graph.remove_edges_from(nx.selfloop_edges(new_graph))
 
     return new_graph
 
@@ -339,6 +354,60 @@ def get_nx_graph(g, cld_name: str, theme_dict = None, unique_theme_names = None)
 
     return g
 
+def clean_variable_name(variable_name):
+    """
+    Cleans a variable name by performing the following transformations:
+    - Replaces '&' with 'and'
+    - Replaces '/' with ' and '
+    - Replaces '_' with ' '
+    - Replaces common abbreviations and acronyms with their full forms
+    - Removes leading/trailing whitespace
+    - Removes extra whitespace between words
+    - Converts the name to lowercase
+    
+    Args:
+        variable_name (str): The variable name to be cleaned.
+    
+    Returns:
+        str: The cleaned variable name.
+    """
+        
+    replacements = {
+        # TODO: Q: Need to refine these. 
+        '&': 'and',  # remove '&'
+        '/': ' and ',  # replace '/' with ' or '
+        # '-': ' ',  # replace '-' with ' '
+        '_': ' ',  # replace '_' with ' '
+        'ipv': 'intimate partner violence',
+        'dss': ' department of social service',
+        'aian': 'american indian and alaska native',
+        'u.s.': 'U.S.',
+        'passages': 'reentry facility',
+        'fasd':'Fetal alcohol spectrum disorder',
+        'alc m': 'alcohol mortality',
+        'mh': 'mental health',
+        'tx': 'tax',
+        'ihs': 'indian health service',
+        'med': 'medication',
+        'sub': 'substance',
+        'ptsd': 'Post-traumatic stress disorder',
+        'aep':'anti-establishment parties',
+        'skillset':'skill set',
+        'rez':'restorative',
+        'aces': 'adverse childhood experience', 
+        'ai': 'american indian',
+        'mh':'mental health'
+
+    }
+
+    for old, new in replacements.items():
+        variable_name = variable_name.replace(old, new)
+
+    variable_name = variable_name.strip()  # remove leading/trailing whitespace
+    variable_name = " ".join(variable_name.split())  # remove extra whitespace between words
+    variable_name = variable_name.lower()  # convert to lowercase
+
+    return variable_name
 
 # def get_dict_of_cld(data_dict, df_aggregate_names, dict_file_rename):
 

@@ -14,10 +14,6 @@ from src.vensim_parser import CLDParser
 
 from src.data_io import read_json, read_cld_file
 
-# sys.path.append(os.path.abspath(os.path.join('..', 'src')))
-# from src import parse_cld, cld_nx
-# from src.parse_cld import read_cld_file, get_cld_df, get_dict_to_vars, get_adjacency_matrix, get_polarity_matrix, get_cld
-# from src.cld_nx import draw_labeled_multigraph
 import traceback
 
 def main():
@@ -35,17 +31,14 @@ def main():
         input_file = sys.argv[1]
         output_file = sys.argv[2]
 
-        # input_file = "toy_example/rabbit_example.mdl"
-
         df = read_cld_file(input_file)
         
         cld = CLDParser(df)
 
         cld_data = cld.get_cld_dict()
-        print(cld_data)
 
-        # with open(output_file, 'wb') as f:
-        #     pickle.dump(cld_data, f)
+        with open(output_file, 'wb') as f:
+            pickle.dump(cld_data, f)
 
         # G = nx.MultiDiGraph(d)
 
