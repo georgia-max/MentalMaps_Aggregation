@@ -166,4 +166,5 @@ Werkzeug==3.0.3
 wheel==0.43.0
 wordcloud==1.9.3
 wrapt==1.16.0
+XlsxWriter==3.2.0
 zipp==3.18.1
