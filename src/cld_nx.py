@@ -409,6 +409,15 @@ def clean_variable_name(variable_name):
 
     return variable_name
 
+def get_cld_graph(dict_cld, cld_name = str):
+    cld_list = dict_cld[cld_name]
+    G = nx.from_dict_of_dicts(cld_list[1], create_using=nx.DiGraph)
+
+    G = nx.relabel_nodes(G, cld_list[0])
+
+    return cld_list, G
+
+
 # def get_dict_of_cld(data_dict, df_aggregate_names, dict_file_rename):
 
 #     dict_cld = {}

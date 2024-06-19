@@ -4,8 +4,8 @@
 
 # Change the directories 
 
-INPUT_DIR="data/PHRAME/Mental Models/Rapid City"
-OUTPUT_DIR="results/PHRAME/JSON_file/RC"
+INPUT_DIR="data/SYNCH/RC/clean"
+OUTPUT_DIR="results/SYNCH/JSON_file/RC/clean"
 
 # Create the output directory if it doesn't already exist
 mkdir -p "$OUTPUT_DIR"
