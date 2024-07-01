@@ -13,7 +13,7 @@ This notebook is designed to translate MDL files to Python. The goal is to creat
 - [License](#license)
 
 
-## Installation
+## Installation (virtual environment)
 
 1. Clone the repository:
 
@@ -29,6 +29,29 @@ This notebook is designed to translate MDL files to Python. The goal is to creat
     ```
     pip install -r requirements.txt
     ```
+
+## Installation (conda)
+
+To finetun the nlp models, you would need GPUs. This instllation guide is for setting up the environment to run on devices with GPUs. 
+1. Clone the repository:
+
+    ```bash
+    [https://github.com/georgia-max/CldMaker.git](https://github.com/georgia-max/Phrame-MentalMaps.git)
+    ```
+2. Create a conda environment. 
+2.1. Download Anaconda. 
+2.2. Create a conda environment.
+```
+conda create --name myconda python3.11
+```
+
+2.3 Install the additional packages. 
+```
+pip install -r requirements_gpu.txt
+```
+
+Alternatively, install pytorch cuda based on your GPU version, and install the additional packages.. 
+
 
 
 ## Usage
