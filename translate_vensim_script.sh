@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Run  ./translate_vensim_script.sh
-
 # Change the directories 
 
 INPUT_DIR="data/SYNCH/RC/clean"
