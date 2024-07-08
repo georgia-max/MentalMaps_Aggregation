@@ -28,3 +28,4 @@ test-trainer/
 *.html
 
 notebook/tmp_trainer/
+fine_tuning_dataset_repository/
