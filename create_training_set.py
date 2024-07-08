@@ -1,15 +1,13 @@
 import pandas as pd
-import pickle
 from itertools import combinations
-from datasets import Dataset 
 
 
 # Step 1: Define the file paths
-input_csv = 'results/SYNCH/training_set/SYNCH_grouping_by_definition_0627.xlsx'  # Replace with your input CSV file path
-output_dataset_path = 'fine_tuning_dataset_repository/dataset/preprocess_SYNCH_grouping_by_definition_0627.csv'  # Replace with your desired output file path
+input_csv = 'fine_tuning_dataset_repository/dataset/manual_grouping_0625.csv'  
+output_dataset_path = 'fine_tuning_dataset_repository/dataset/XXX.csv'  
 
 # Step 2: Read the CSV file into a DataFrame
-df = pd.read_excel(input_csv, sheet_name= "manual grouping_0625")
+df = pd.read_csv(input_csv)
 
 # Step 3: Convert the DataFrame to a dictionary
 
