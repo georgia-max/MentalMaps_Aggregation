@@ -9,12 +9,12 @@ The final output is a dictionary of CLD graphs with the matching nodes and their
 """
 
 
-
 import os
 import pickle
-import pandas as pd
 from collections import OrderedDict
+
 import networkx as nx
+import pandas as pd
 from sentence_transformers import SentenceTransformer
 
 # Constants
@@ -22,6 +22,7 @@ FOLDER_PATH = '/Users/gl665/Documents/Phrame-MentalMaps-1/data/jsonfiles'
 INPUT_FILE = 'data/data_dictionary/RC_models_data dictionary.xlsx'
 SIMILARITY_THRESHOLD = 0.7
 MODEL_NAME = "all-mpnet-base-v2"
+
 
 def load_clds_from_json():
     """Load CLD graphs from JSON files"""
@@ -41,11 +42,12 @@ def load_clds_from_json():
                 count += 1
     return clds_dict
 
+
 def load_data_dictionary():
     """Load data dictionary from Excel file"""
     file_path = os.path.join(os.getcwd(), INPUT_FILE)
     excel_data = pd.read_excel(file_path, sheet_name=None)
-    
+
     data_dictionary = {}
     for k, v in excel_data.items():
         v.columns.values[0] = "variable"
@@ -54,16 +56,17 @@ def load_data_dictionary():
         data_dictionary[k] = v
     return data_dictionary
 
+
 def find_node_name_matches(vensim_nodes, vars_def_pair):
     """Find matching nodes based on semantic similarity"""
     model = SentenceTransformer(MODEL_NAME)
     embeddings_cld = model.encode(vensim_nodes)
     excel_nodes = list(vars_def_pair.keys())
     embeddings_excel = model.encode(excel_nodes)
-    
+
     node_var_def_dict = {}
     similarities = model.similarity(embeddings_cld, embeddings_excel)
-    
+
     for idx_i, vensim_node in enumerate(vensim_nodes):
         matches = []
         for idx_j, excel_node in enumerate(excel_nodes):
@@ -71,36 +74,31 @@ def find_node_name_matches(vensim_nodes, vars_def_pair):
                 matches.append([excel_node, vars_def_pair[excel_node]])
         if matches:
             node_var_def_dict[vensim_node] = matches
-    
+
     return node_var_def_dict
+
 
 def main():
     # Load CLDs and data dictionary
     clds_dict = load_clds_from_json()
     data_dictionary = load_data_dictionary()
     vars_def_dict = {}
-    
+
     # Process each CLD
     for v, k in clds_dict.items():
         nx_graph = clds_dict[v]["cld_graph"]
         node_names = list(nx_graph.nodes)
-        
+
         df = data_dictionary[v]
         vars_def_pair = dict(zip(df.iloc[:, 0], df.iloc[:, 1]))
-        
+
         node_var_def_dict = find_node_name_matches(node_names, vars_def_pair)
         clds_dict[v]["node_var_def_dict"] = node_var_def_dict
-        
+
         vars_def_dict.update(node_var_def_dict)
         # print(vars_def_dict)
-        
-        
-    
-    
-        
-        
+
+
         # print(clds_dict)
-
-
 if __name__ == "__main__":
     main()
