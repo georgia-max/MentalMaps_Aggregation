@@ -1,7 +1,6 @@
-# Mental Maps translator! :panda_face: :four_leaf_clover:	
+# Mental Maps translator
 
-This notebook is designed to translate MDL files to Python. The goal is to create a script that can automatically convert Causal Loop Diagrams into Adjacency Matrix, which can then be used for network analysis.
-
+Read vensim files to graphs
 ## Table of Contents
 
 - [Installation](#installation)
