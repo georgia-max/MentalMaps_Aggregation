@@ -22,6 +22,8 @@ FOLDER_PATH = '/Users/gl665/Documents/Phrame-MentalMaps-1/data/jsonfiles'
 INPUT_FILE = 'data/data_dictionary/RC_models_data dictionary.xlsx'
 SIMILARITY_THRESHOLD = 0.7
 MODEL_NAME = "all-mpnet-base-v2"
+OUTPUT_FILE = 'data/data_dictionary/all_vars_def_dictionary.pkl'
+CLD_DICT_OUTPUT_FILE = 'data/data_dictionary/clds_dictionary.pkl'
 
 
 def load_clds_from_json():
@@ -96,9 +98,14 @@ def main():
         clds_dict[v]["node_var_def_dict"] = node_var_def_dict
 
         vars_def_dict.update(node_var_def_dict)
-        # print(vars_def_dict)
+
+        with open(OUTPUT_FILE, 'wb') as f:
+            pickle.dump(vars_def_dict, f)
+        
+        
+        with open(CLD_DICT_OUTPUT_FILE, 'wb') as f:
+            pickle.dump(clds_dict, f)
 
 
-        # print(clds_dict)
 if __name__ == "__main__":
     main()
