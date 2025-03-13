@@ -60,6 +60,7 @@ def load_data_dictionary():
 
 
 def find_node_name_matches(vensim_nodes, vars_def_pair):
+    
     """Find matching nodes based on semantic similarity"""
     model = SentenceTransformer(MODEL_NAME)
     embeddings_cld = model.encode(vensim_nodes)
