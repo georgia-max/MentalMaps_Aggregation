@@ -6,6 +6,12 @@ import openai
 import pandas as pd
 from dotenv import load_dotenv
 
+INPUT_FILE_FOLDER_PATH = "/Users/gl665/Documents/Phrame-MentalMaps-1/data/read_for_label/batch_tasks_LLM/results_0318"
+
+INPUT_SENTENCE_PAIRS_FILE_PATH = "/Users/gl665/Documents/Phrame-MentalMaps-1/data/read_for_label/batch_sum_nlp_results/all_definition_pairs_llm.csv"
+OUTPUT_FILE_PATH = INPUT_FILE_FOLDER_PATH + \
+    "/processed_llm_inferenced_results.csv"
+
 
 def load_api_keys():
     """Load API keys from environment variables."""
@@ -36,10 +42,10 @@ def load_results(result_file_path):
                 json_object = json.loads(line)
                 results.append(json_object)
             except json.JSONDecodeError as e:
-                print(f"Error parsing JSON on line {line_number}:")
-                print(f"Line content: {line}")
-                print(f"Error details: {str(e)}")
-                print("---")
+                # print(f"Error parsing JSON on line {line_number}:")
+                # print(f"Line content: {line}")
+                # print(f"Error details: {str(e)}")
+                # print("---")
                 continue  # Skip this line and continue with the next one
 
     print(f"Successfully parsed {len(results)} results")
@@ -69,12 +75,16 @@ def process_results(results, df):
             print(f"Error processing result for task {task_id}: {str(e)}")
             print(f"Problematic content: {content}")
             categories.append(None)
+        
+
 
     # Create a Series with the categories
     category_series = pd.Series(categories, index=indices)
 
     # Add categories to the DataFrame
     df['category'] = category_series
+    # only keeep the rows with category not null
+    df = df[df["category"].notnull()]
 
     return df
 
@@ -82,29 +92,37 @@ def process_results(results, df):
 def main():
     try:
 
-        # File paths
-        result_file = "notebook/result_0307.jsonl"
-        # Update this path as needed
-        input_csv = "data/read_for_label/all_definition_pairs.csv"
-        output_csv = "notebook/processed_results.csv"
-
         # Load the original DataFrame
-        df = pd.read_csv(input_csv, index_col=0)
+        df = pd.read_csv(INPUT_SENTENCE_PAIRS_FILE_PATH)
+
         df.rename(columns={"Variable 1": "sentence1",
                   "Variable 2": "sentence2"}, inplace=True)
 
-        # Load and process results
-        results = load_results(result_file)
-        df = process_results(results, df)
+        # Load all the files path in the folder
+        all_files = [
+            os.path.join(INPUT_FILE_FOLDER_PATH, f)
+            for f in os.listdir(INPUT_FILE_FOLDER_PATH)
+            if f.endswith(".jsonl")]
+
+        processed_dfs = []
+        for i in all_files:
+            results = load_results(i)
+            processed_df = process_results(results, df.copy())
+            processed_dfs.append(processed_df)
+
+        if processed_dfs:
+            final_df = pd.concat(processed_dfs, ignore_index=True)
+        else:
+            final_df = df
 
         # Save processed results
-        df.to_csv(output_csv)
+        final_df.to_csv(OUTPUT_FILE_PATH)
 
         # Print statistics
         print("\nCategory distribution:")
-        print(df['category'].value_counts(dropna=False))
+        print(final_df['category'].value_counts(dropna=False))
         print("\nFirst few rows of processed data:")
-        print(df.head())
+        print(final_df.head())
 
     except Exception as e:
         print(f"An error occurred: {str(e)}")

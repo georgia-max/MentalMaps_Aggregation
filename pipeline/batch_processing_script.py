@@ -1,4 +1,7 @@
-# %%
+"""
+
+The script takes the batch tasks data and processes it to create a batch job.
+"""
 import json
 import os
 from pprint import pprint
@@ -7,6 +10,10 @@ import openai
 import pandas as pd
 from dotenv import load_dotenv
 from sklearn.model_selection import train_test_split
+
+INPUT_SENTENCE_PAIRS_FILE_PATH = "/Users/gl665/Documents/Phrame-MentalMaps-1/data/read_for_label/batch_sum_nlp_results/all_definition_pairs_llm.csv"
+
+OUTPUR_DIR = "/Users/gl665/Documents/Phrame-MentalMaps-1/data/read_for_label/batch_tasks_LLM"
 
 
 def load_api_keys():
@@ -79,8 +86,9 @@ def create_tasks(df):
 
     return tasks
 
-
 # Creating the file
+
+
 def create_batch_job(tasks, file_name: str):
     """
     Creates a batch job from a list of tasks.
@@ -94,6 +102,8 @@ def create_batch_job(tasks, file_name: str):
     """
     # Write tasks to JSONL file
     client = load_api_keys()
+
+    file_name = os.path.join(OUTPUR_DIR, file_name)
 
     with open(file_name, 'w') as file:
         for obj in tasks:
@@ -116,112 +126,19 @@ def create_batch_job(tasks, file_name: str):
 
     return batch_job
 
-# # %% [markdown]
-# # # check batch status
-
-# # %%
-# batch_job = client.batches.retrieve(batch_job.id)
-# print(batch_job)
-
-# # %%
-# batch_job.output_file_id
-
-# # %%
-# result_file_id = batch_job.output_file_id
-# result = client.files.content(result_file_id).content
-
-# # %%
-# result_file_name = "batch_job_results_mental_maps_all_data.jsonl"
-
-
-# with open(result_file_name, 'wb') as file:
-#     file.write(result)
-
-# # %%
-# result_file_name = "result_0307.jsonl"
-
-# # %%
-# #  Loading data from saved file
-# results = []
-# with open(result_file_name, 'r') as file:
-#     for line in file:
-#         # Parsing the JSON string into a dict and appending to the list of results
-#         json_object = json.loads(line.strip())
-#         results.append(json_object)
-
-# # %%
-# # Then, when processing results, use this code:
-# for res in results:
-#     task_id = res['custom_id']
-#     # Getting index from task id
-#     index = int(task_id.split('-')[-1])
-#     result = res['response']['body']['choices'][0]['message']['content']
-
-#     # Find the row in the DataFrame that matches this index
-#     matching_rows = all_variables_pairs_df[all_variables_pairs_df.index == index]
-
-#     if not matching_rows.empty:
-#         row = matching_rows.iloc[0]
-#         print(f"Sentence 1: {row['sentence1']}")
-#         print(f"Sentence 2: {row['sentence2']}")
-#         print("Result:", result)
-#     else:
-#         print(f"Warning: Index {index} not found in DataFrame")
-
-#     print("\n\n----------------------------\n\n")
-
-# # %%
-# # In the result file, the final result is in the format: "{"categories": [1]}", Parse the json object and add the integer to the dataframe
-
-# # Initialize a list to store the categories
-# categories = []
-
-# # Extract categories from results
-# for res in results:
-#     result_str = res['response']['body']['choices'][0]['message']['content']
-#     try:
-#         result_dict = json.loads(result_str)
-#         category = result_dict['categories'][0]
-#         categories.append(int(category))
-#         print(category)
-#     except (json.JSONDecodeError, KeyError, IndexError) as e:
-#         print(f"Error processing result: {e}")
-#         print(f"Problematic content: {result_str}")
-#         categories.append(None)  # Add None for failed entries
-
-# # Add categories as a new column to the DataFrame
-# # Create a Series with the same index as the results
-# result_indices = [int(res['custom_id'].split('-')[-1]) for res in results]
-# category_series = pd.Series(categories, index=result_indices)
-
-# # Update the DataFrame with the new categories
-# all_variables_pairs_df['category'] = category_series
-
-# # Read the result file
-# print("\nFirst few rows of the DataFrame:")
-# print(all_variables_pairs_df.head())
-
-# # Print some statistics
-# print("\nCategory distribution:")
-# print(all_variables_pairs_df['category'].value_counts(dropna=False))
-
-# # %%
-# all_variables_pairs_df
 
 def main():
 
     # %%
     # all_variables_pairs_df = pd.read_csv("all_variable_pairs.csv")
     all_variables_pairs_df = pd.read_csv(
-        "data/read_for_label/all_definition_pairs.csv")
+        INPUT_SENTENCE_PAIRS_FILE_PATH)
 
     all_variables_pairs_df.rename(
         columns={"Variable 1": "sentence1", "Variable 2": "sentence2"}, inplace=True)
     all_variables_pairs_df.head()
 
-    # drop the last 40000 rows
-    # already processed
-    all_variables_pairs_df = all_variables_pairs_df.iloc[400000:-40000]
+    # all_variables_pairs_df = all_variables_pairs_df.iloc[400000:-40000]
     print(f"total number of rows: {all_variables_pairs_df.shape[0]}")
 
     # split the dataframe into 20000 rows each and create a list of dataframes for batch processing the tasks
@@ -232,7 +149,7 @@ def main():
 
     i = 0
     for df in df_list:
-        file_name = f"data/batch_tasks/batch_tasks_mentalmap_{i}.jsonl"
+        file_name = f"batch_tasks_mentalmap_{i}.jsonl"
         tasks = create_tasks(df)
         batch_job = create_batch_job(tasks, file_name)
         i += 1
