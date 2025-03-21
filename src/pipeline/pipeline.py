@@ -3,7 +3,7 @@ from typing import Dict, Optional
 
 from src.data_management.data_loader import DataLoader
 from src.data_management.data_saver import DataSaver
-from src.pipeline.semantic_matching import SemanticMatchingProcessor
+from src.semantic_matching.semantic_matching import SemanticMatchingProcessor
 
 # from src.parsers.json_parser import JSONParser
 # from src.graph_processing.graph_builder import GraphBuilder
@@ -51,13 +51,15 @@ class Pipeline:
         """
         # Load data
         clds_dict = self.loader.load_clds_from_directory(input_dir)
-
         # print(clds_dict)
-        data_dictionary = self.loader.load_data_dictionary(data_dict_path)
 
-        # Process CLDs with semantic matching
-        clds_dict, vars_def_dict = self.semantic_processor.process_all_clds(
-            clds_dict, data_dictionary)
+        data_dictionary = self.loader.load_data_dictionary_from_excel(
+            data_dict_path)
+        print(data_dictionary)
+
+        # # # Process CLDs with semantic matching
+        # clds_dict, vars_def_dict = self.semantic_processor.process_all_clds(
+        #     clds_dict, data_dictionary)
 
         # Save results
         output_dir = Path(output_dir)
@@ -67,10 +69,10 @@ class Pipeline:
         #     vars_def_dict,
         #     output_dir / "all_vars_def_dictionary.pkl"
         # )
-        self.saver.save_clds_dictionary(
-            clds_dict,
-            output_dir / "clds_dictionary.pkl"
-        )
+        # self.saver.save_clds_dictionary(
+        #     clds_dict,
+        #     output_dir / "clds_dictionary.pkl"
+        # )
 
 
 def main():
@@ -81,7 +83,7 @@ def main():
     INPUT_CLD_FOLDER = base_dir / \
         "data/raw/rc_mental_models_clean"
 
-    data_dict_path = base_dir / "data/data_dictionary/RC_models_data dictionary.xlsx"
+    data_dict_path = base_dir / "data/data_dictionary/Data_Dictionary.xlsx"
 
     OUTPUT_CLD_FOLDER = base_dir / "data/just_testing"
 
