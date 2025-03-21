@@ -1,0 +1,7 @@
+Metadata-Version: 2.4
+Name: phrame-mental-maps
+Version: 0.1
+Requires-Dist: networkx
+Requires-Dist: pandas
+Requires-Dist: numpy
+Dynamic: requires-dist
