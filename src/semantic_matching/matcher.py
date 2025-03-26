@@ -55,8 +55,7 @@ class SemanticMatcher:
                 ....
             }
         """
-        
-    # TODO: I DONT KNOW, I AM SO CONFUSED. WHAT SHOULD I DO WITH MY LIFE
+        #TODO: not yet totally fixed.... something is wrong with the embeddings. . 
         # Get embeddings for source and target texts
         embeddings_source = self.model.encode(
             source_texts,
