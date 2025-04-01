@@ -27,7 +27,7 @@ class DataSaver:
         }
 
     def save_data(self, data: Any, file_path: Union[str, Path],
-                  config: Optional[SaveConfig] = None) -> None:
+                  config: Optional[SaveConfig] = None) ->  None:
         """
         Save data to a file.
         
@@ -46,6 +46,7 @@ class DataSaver:
             raise ValueError(f"Unsupported format: {config.format}")
 
         self.supported_formats[config.format](data, file_path, config)
+        
 
     def save_clds_dictionary(self, clds_dict: Dict, file_path: Union[str, Path]) -> None:
         """
