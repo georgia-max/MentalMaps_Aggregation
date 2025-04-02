@@ -4,7 +4,7 @@ from collections import defaultdict
 from typing import Dict, List, Set, Tuple
 
 import networkx as nx
-
+import gravis as gv
 from src.data_management.data_loader import DataLoader
 from src.data_management.data_saver import DataSaver
 from src.graph_processing.graph_properties import CLDGraph
@@ -29,13 +29,12 @@ def main():
     i = 0
     for graph in data:
         cld_graph = CLDGraph(graph)
-        cld_graph.build_CLD_graph(cld_name= i)
+        cld_graph.build_CLD_graph(cld_name=i)
         # print(cld_graph.graph_properties())
         # print(cld_graph.node_properties())
         # print(cld_graph.edge_properties())
         list_of_cld_graphs.append(cld_graph)
         i += 1
-
 
     trimmer = LinkTrimmer(list_of_cld_graphs)
 
@@ -54,11 +53,25 @@ def main():
 
     print(final_graph.graph_properties())
 
-    # print(final_graph.node_properties())
+    print(final_graph.node_properties())
     print(final_graph.edge_properties())
 
     # graph_print = GraphVisualizer(
     #     final_graph, edge_colors='blue', node_colors='lightblue')
+
+    # # Convert to gravis format and visualize
+    # gravis_data = graph_print.to_gravis_format()
+    # gv.d3(gravis_data,
+    #       graph_height=600,
+    #       edge_curvature=-0.5,
+    #       node_drag_fix=False,
+    #       node_size_data_source="degree",
+    #       use_node_size_normalization=True,
+    #       node_size_normalization_min=15,
+    #       node_size_normalization_max=35,
+    #       show_node_label=True,
+    #       many_body_force_strength=-500
+    #       )
 
     # print(graph_print.node_colors)
 
