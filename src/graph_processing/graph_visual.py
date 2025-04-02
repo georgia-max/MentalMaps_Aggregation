@@ -1,13 +1,13 @@
 import networkx as nx
 import matplotlib.pyplot as plt
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Union   
 from src.graph_processing.graph_properties import CLDGraph
 
 
 class GraphVisualizer:
     """A class to visualize CLDGraph using different visualization libraries."""
 
-    def __init__(self, cld_graph: CLDGraph,
+    def __init__(self, cld_graph: Union[CLDGraph],
                  edge_colors: Optional[Dict[int, str]] = None,
                  node_colors: Optional[Dict[str, str]] = None):
         """
@@ -26,7 +26,7 @@ class GraphVisualizer:
             raise TypeError("Input graph must be an instance of CLDGraph")
 
         self.graph = cld_graph
-        self.node_colors = node_colors or {'org': 'blue', 'theme': 'green'}
+        self.node_colors = node_colors # or {'org': 'blue', 'theme': 'green'}
         self.edge_colors = edge_colors or {1: 'blue', -1: 'green',
                                            3: 'black', 0: 'red'}
 
@@ -110,69 +110,7 @@ class GraphVisualizer:
             return dict(self.graph.edges[source, target])
         return {}
 
-    def gravis_settings(self) -> CLDGraph:
-        """
-        Configure visual settings for nodes and edges in the graph.
 
-        Sets colors and interactive features (click behavior, tooltips) for nodes and edges
-        based on their attributes:
-
-        Node Settings:
-        - Colors: blue (org nodes), green (theme nodes)
-        - Tooltips: Shows CLD name and level
-
-        Edge Settings:
-        - Colors based on weight:
-            * blue (+1): positive relationship
-            * green (-1): negative relationship
-            * black (3): neutral/special relationship
-            * red (0): no effect
-        - Tooltips: Shows CLD name and weight/polarity
-
-        Returns:
-            CLDGraph: The graph with visual settings applied
-        """
-        # Node settings
-        if isinstance(self.node_colors, str):
-            node_color = self.node_colors
-            for node, data in self.graph.nodes(data=True):
-                data['color'] = node_color
-        else:
-            for node, data in self.graph.nodes(data=True):
-                level = data.get('level', 'org')
-                data['color'] = self.node_colors.get(level, 'gray')
-
-        # Edge settings
-        if isinstance(self.edge_colors, str):
-            edge_color = self.edge_colors
-            for u, v, data in self.graph.edges(data=True):
-                data['color'] = edge_color
-        else:
-            for u, v, data in self.graph.edges(data=True):
-                weight = data.get('weight', 0)
-                data['color'] = self.edge_colors.get(weight, 'gray')
-
-        # Set tooltips for all nodes
-        for node, data in self.graph.nodes(data=True):
-            node_info = (
-                f"\nNode Features:"
-                f"\nCLD: {data.get('cld', 'N/A')}"
-                f"\nLevel: {data.get('level', 'org')}"
-            )
-            data['click'] = node_info
-            data['title'] = node_info
-
-        # Set tooltips for all edges
-        for u, v, data in self.graph.edges(data=True):
-            edge_info = (
-                f"\nEdge Features:"
-                f"\nCLD: {data.get('cld', 'N/A')}"
-                f"\nPolarity Sign: {data.get('weight', 0)}"
-            )
-            data['click'] = edge_info
-            data['title'] = edge_info
-
-        return self.graph
 
     def get_graph(self) -> CLDGraph:
         """
@@ -182,46 +120,6 @@ class GraphVisualizer:
             CLDGraph: The graph with visual settings applied
         """
         return self.gravis_settings()
-
-    def to_gravis_format(self) -> Dict:
-        """
-        Convert the NetworkX graph to a format that gravis can understand.
-
-        Returns:
-            Dict: A dictionary containing the graph data in gravis format
-        """
-        # Apply visual settings first
-        graph = self.gravis_settings()
-
-        # Convert to gravis format
-        gravis_data = {
-            'nodes': [],
-            'links': []  # gravis uses 'links' instead of 'edges'
-        }
-
-        # Add nodes
-        for node, data in graph.nodes(data=True):
-            gravis_data['nodes'].append({
-                'id': str(node),  # ensure id is string
-                'name': str(node),  # gravis uses 'name' for display
-                'color': data.get('color', 'gray'),
-                'size': 20,
-                # gravis uses 'tooltip' instead of 'title'
-                'tooltip': data.get('title', '')
-            })
-
-        # Add edges (as links)
-        for u, v, data in graph.edges(data=True):
-            gravis_data['links'].append({
-                'source': str(u),  # ensure source is string
-                'target': str(v),  # ensure target is string
-                'color': data.get('color', 'gray'),
-                'width': 2,
-                # gravis uses 'tooltip' instead of 'title'
-                'tooltip': data.get('title', '')
-            })
-
-        return gravis_data
 
 
 # Example usage

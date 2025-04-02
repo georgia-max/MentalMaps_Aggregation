@@ -152,11 +152,12 @@ class LinkTrimmer:
         ]
 
         # Create and return the trimmed graph
-        trimmed_graph = CLDGraph()
-        trimmed_graph.build_CLD_graph()
+        trimmed_graph = nx.Digraph()
 
         trimmed_graph.add_weighted_edges_from(weighted_edges, weight="count")
+        print(trimmed_graph.edges(data=True))
 
+        # trimmed_graph = trimmed_graph.build_CLD_graph()
 
         # linked_weights = self.get_link_weights()
         # for link, weights in linked_weights.items():

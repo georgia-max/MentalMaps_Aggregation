@@ -44,6 +44,7 @@ def main():
 
     # Get trimmed graph
     trimmed_graph = trimmer.get_trimmed_graph(
+        
         trimmed_edges_threshold=edge_threshold,
         trimmed_nodes_threshold=node_threshold
     )
@@ -58,6 +59,21 @@ def main():
 
     # graph_print = GraphVisualizer(
     #     final_graph, edge_colors='blue', node_colors='lightblue')
+    
+    processed_graph = final_graph.gravis_settings()
+
+    print(processed_graph.node_properties())
+    print(processed_graph.edge_properties())
+    gv.d3(processed_graph,
+          graph_height=600,
+          edge_curvature=-0.5,
+          node_drag_fix=False,
+          node_size_data_source="size",
+          use_node_size_normalization=True,
+          node_size_normalization_min=15,
+          node_size_normalization_max=35
+          
+          )
 
     # # Convert to gravis format and visualize
     # gravis_data = graph_print.to_gravis_format()

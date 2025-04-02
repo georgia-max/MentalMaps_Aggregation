@@ -1,6 +1,7 @@
 import itertools as it
 import matplotlib.pyplot as plt
 import networkx as nx
+from typing import Union
 
 
 class CLDGraph(nx.DiGraph):
@@ -50,11 +51,12 @@ class CLDGraph(nx.DiGraph):
             nx.set_node_attributes(self, attrs)
 
         if cld_name is not None:
-            nx.set_node_attributes(self, {node: {'cld_name': cld_name} for node in self.nodes()})
+            nx.set_node_attributes(
+                self, {node: {'cld_name': cld_name} for node in self.nodes()})
 
         return self
 
-    def set_edge_attributes(self, name_of_attr_to_set = None, dict_of_weights=None):
+    def set_edge_attributes(self, name_of_attr_to_set=None, dict_of_weights=None):
         """
         Sets the edge attributes of the graph, including the weight.
 
@@ -65,12 +67,12 @@ class CLDGraph(nx.DiGraph):
             edge: {'weight': int(weight)}
             for edge, weight in nx.get_edge_attributes(self, 'weight').items()
         }
-        #TODO: this is not working
+        # TODO: this is not working
         if name_of_attr_to_set is not None:
             for edge in edge_attrs:
                 if edge in dict_of_weights:
                     edge_attrs[edge][name_of_attr_to_set] = dict_of_weights[edge]
-            
+
         nx.set_edge_attributes(self, edge_attrs)
         return self
 
@@ -115,8 +117,90 @@ class CLDGraph(nx.DiGraph):
             edge_properties[source, target] = attributes
 
         return edge_properties
+    
+    def to_gravis(self) -> nx.DiGraph:
+        """Convert CLDGraph to nx.DiGraph format suitable for gravis"""
+        digraph = nx.DiGraph(self)
+        digraph.graph = self.graph.copy()
+        return digraph
 
-    def build_CLD_graph(self, cld_name=None,  theme_dict=None ) -> 'CLDGraph':
+
+    def gravis_settings(self):
+
+        new_graph = nx.convert_node_labels_to_integers(self, label_attribute='label')
+
+        # set node size
+        new_graph.graph['node_size'] = 10
+        # new_graph.graph['edge_size'] = 2  
+        new_graph.graph['node_color'] = 'green'
+        new_graph.graph['edge_color'] = 'black'
+
+        # new_graph.graph['node_label'] = str
+
+        # edge properties based on weight 
+        if any('weight' in data for _, _, data in new_graph.edges.data()):
+            for edge in new_graph.edges:
+                edge = new_graph.edges[edge]
+                edge['edge_size'] = edge['weight'] *0.7
+
+        else:
+            new_graph.graph['edge_size'] = 1
+
+        
+
+
+
+
+
+        # # set edge size based on weight or count
+        # if 'weight' in self.edges.data():
+        #     wieght_dict = {edge: self.edges[edge]['weight'] for edge in self.edges}
+            
+
+        #     nx.set_edge_attributes(new_graph, wieght_dict, 'edge_size')
+        # else:
+        #     nx.set_edge_attributes(new_graph, 2, 'edge_size')
+
+
+
+        # # nx.set_node_attributes(new_graph, 10, 'size')
+        # nx.set_node_attributes(new_graph, 'green', 'color')
+
+        # # set edge size
+        # nx.set_edge_attributes(new_graph, 2, 'size')
+        # nx.set_edge_attributes(new_graph, 'black', 'color')
+
+        # # set node label
+        # nx.set_node_attributes(new_graph, str, 'label')
+
+        # # Initialize graph metadata if not present
+        # if not hasattr(self, 'graph'):
+        #     self.graph = {}
+        
+        # # Set basic graph attributes
+        # self.graph['directed'] = True
+        # self.graph['name'] = 'CLD Graph'
+        
+        # # Set node attributes
+        # for node in self.nodes():
+        #     self.nodes[node].update({
+        #         'size': 10,
+        #         'color': node_color if isinstance(node_color, str) else node_color.get(node, 'lightblue'),
+        #         'label': str(node)
+        #     })
+        
+        # # Set edge attributes
+        # for edge in self.edges():
+        #     self.edges[edge].update({
+        #         'size': 2,
+        #         'color': edge_color if isinstance(edge_color, str) else edge_color.get(edge, 'black'),
+        #         'label': str(self.edges[edge].get('weight', ''))
+        #     })
+
+        return new_graph
+    
+
+    def build_CLD_graph(self, cld_name=None,  theme_dict=None) -> 'CLDGraph':
         """
         Build a CLD graph with the specified theme dictionary.
 
