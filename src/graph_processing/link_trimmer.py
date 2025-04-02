@@ -101,13 +101,24 @@ class LinkTrimmer:
         """
         edge_counts = self.count_edge_appearances()
         trimmed_nodes = self.trim_nodes(trim_nodes_threshold)
+        set_of_trimmed_nodes = set(trimmed_nodes.keys())
 
-        return {
+        trimmed_edges = {
             edge: count
             for edge, count in edge_counts.items()
-            if (edge[0] in trimmed_nodes or edge[1] in trimmed_nodes)
+            if (edge[0] in set_of_trimmed_nodes and edge[1] in set_of_trimmed_nodes)
             and count > trim_edge_threshold
         }
+
+        included_nodes = set()
+        # get all nodes in trimmed_edges
+        for edge in trimmed_edges:
+            included_nodes.update(edge)
+
+        # Create a dictionary containing only the nodes that are part of edges
+        fin_trim_nodes = {node: trimmed_nodes[node] for node in included_nodes}
+
+        return fin_trim_nodes, trimmed_edges
 
     def get_link_weights(self) -> Dict[Tuple[str, str], List[int]]:
         """
@@ -140,9 +151,8 @@ class LinkTrimmer:
         Returns:
             New NetworkX directed graph with trimmed edges
         """
-        trimmed_edges = self.trim_edges(
-            trimmed_edges_threshold,
-            trimmed_nodes_threshold
+        trimmed_nodes, trimmed_edges = self.trim_edges(
+            trimmed_edges_threshold, trimmed_nodes_threshold
         )
 
         # Create edges with weights
@@ -152,19 +162,13 @@ class LinkTrimmer:
         ]
 
         # Create and return the trimmed graph
-        trimmed_graph = nx.Digraph()
+        trimmed_graph = nx.DiGraph()
+        # Add nodes with their count attributes
+        node_attrs = [(node, {'weight': count})
+                      for node, count in trimmed_nodes.items()]
 
-        trimmed_graph.add_weighted_edges_from(weighted_edges, weight="count")
-        print(trimmed_graph.edges(data=True))
+        trimmed_graph.add_nodes_from(node_attrs)
 
-        # trimmed_graph = trimmed_graph.build_CLD_graph()
-
-        # linked_weights = self.get_link_weights()
-        # for link, weights in linked_weights.items():
-        #     print(link, weights)
-
-        # trimmed_graph.add_weighted_edges_from(self.get_link_weights(), weight="weights")
-
-        # trimmed_graph.add_edges_from(original_graph.edges())
+        trimmed_graph.add_weighted_edges_from(weighted_edges, weight="weight")
 
         return trimmed_graph

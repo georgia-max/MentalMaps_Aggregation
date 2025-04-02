@@ -130,18 +130,34 @@ class CLDGraph(nx.DiGraph):
         new_graph = nx.convert_node_labels_to_integers(self, label_attribute='label')
 
         # set node size
-        new_graph.graph['node_size'] = 10
+        # new_graph.graph['node_size'] = 10
         # new_graph.graph['edge_size'] = 2  
+        new_graph.graph['node_label_size_factor'] = 1
         new_graph.graph['node_color'] = 'green'
-        new_graph.graph['edge_color'] = 'black'
+        new_graph.graph['edge_color'] = 'blue'
 
-        # new_graph.graph['node_label'] = str
+        for _, data in new_graph.nodes.data():
+            data['opacity'] = 0.5
+        for _, _, data in new_graph.edges.data():
+            data['opacity'] = 0.5
+
+        # node properties based on weight 
+        if any('weight' in data for _, data in new_graph.nodes.data()):
+            for node in new_graph.nodes:
+                node_attr = new_graph.nodes[node]
+                node_attr['node_size'] = node_attr['weight'] * 5
+                node_attr['node_label_size'] = node_attr['weight']
+        else:
+            new_graph.graph['node_size'] = 1
+
+
 
         # edge properties based on weight 
         if any('weight' in data for _, _, data in new_graph.edges.data()):
             for edge in new_graph.edges:
                 edge = new_graph.edges[edge]
-                edge['edge_size'] = edge['weight'] *0.7
+                edge['edge_size'] = edge['weight'] *0.3
+                edge['edge_label'] = edge['weight']
 
         else:
             new_graph.graph['edge_size'] = 1
